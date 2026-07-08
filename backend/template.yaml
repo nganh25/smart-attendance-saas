@@ -250,7 +250,7 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: 'aws:kms'
-              KMSMasterKeyId: !Ref DataKMSKey
+              KMSMasterKeyID: !Ref DataKMSKey
             BucketKeyEnabled: true
       LifecycleConfiguration:
         Rules:
@@ -521,7 +521,7 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: 'aws:kms'
-              KMSMasterKeyId: !Ref DataKMSKey
+              KMSMasterKeyID: !Ref DataKMSKey
             BucketKeyEnabled: true
 
   # ─── CloudFront Origin Access Control (OAC) ───
