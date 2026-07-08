@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh Toán Dịch Vụ - SaaS Attendance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-md w-full bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+        <div class="bg-indigo-600 p-6 text-white text-center">
+            <h2 class="text-xl font-bold tracking-wide">💳 CỔNG THANH TOÁN SAAS</h2>
+            <p class="text-xs text-indigo-200 mt-1">Gia hạn hệ thống doanh nghiệp tự động qua PayOS</p>
+        </div>
+        <div class="p-6 space-y-6">
+            <div class="bg-slate-50 p-4 rounded-xl border border-dashed border-slate-300">
+                <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Thông tin hóa đơn</label>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-lg">Gói Doanh Nghiệp</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Doanh nghiệp: <span id="displayTenant" class="font-semibold text-indigo-600">---</span></p>
+                        <p class="text-[11px] text-slate-400">Thời hạn: 30 ngày sử dụng dữ liệu AWS</p>
+                    </div>
+                    <span class="bg-indigo-50 text-indigo-600 text-xs font-bold px-2.5 py-1 rounded-full">SaaS Plan</span>
+                </div>
+            </div>
+            <div class="flex justify-between items-center border-b pb-4">
+                <span class="text-sm font-medium text-slate-500">Số tiền cần thanh toán:</span>
+                <span class="text-2xl font-black text-slate-900">50.000đ</span>
+            </div>
+            <div class="space-y-3">
+                <button onclick="requestPaymentLink()" id="btnPay" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition tracking-wide shadow-md flex justify-center items-center gap-2">
+                    <span>XÁC NHẬN & QUÉT MÃ QR VIA PAYOS</span>
+                </button>
+                
+                <a href="index.html" class="block text-center text-xs text-slate-400 hover:text-slate-600 font-medium transition py-1">
+                    ◀ Quay lại Không gian làm việc
+                </a>
+            </div>
+        </div>
+        <div class="bg-slate-50 px-6 py-3 border-t text-center text-[10px] text-slate-400">
+            🔒 Kết nối bảo mật SSL mã hóa đầu cuối bởi PayOS
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:3000";
+        window.onload = function() {
+            const savedUser = localStorage.getItem('logged_user');
+            if (savedUser) {
+                const currentUser = JSON.parse(savedUser);
+                document.getElementById('displayTenant').innerText = currentUser.tenantId;
+            }
+        };
+
+        async function requestPaymentLink() {
+            const savedUser = localStorage.getItem('logged_user');
+            if (!savedUser) {
+                alert("Vui lòng đăng nhập hệ thống trước khi thanh toán!");
+                window.location.href = "login.html";
+                return;
+            }
+
+            const currentUser = JSON.parse(savedUser);
+            const btnPay = document.getElementById('btnPay');
+            
+            btnPay.disabled = true;
+            btnPay.innerText = "ĐANG TẠO HÓA ĐƠN...";
+            btnPay.classList.replace('bg-indigo-600', 'bg-slate-400');
+
+            try {
+                const res = await fetch(`${API_BASE}/billing/create-payment`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        tenantId: currentUser.tenantId,
+                        amount: 50000,
+                        packageName: "Gói_Tháng_SaaS"
+                    })
+                });
+                
+                const data = await res.json();
+
+                if (res.ok && data.checkoutUrl) {
+                    window.location.href = data.checkoutUrl;
+                } else {
+                    alert("📌 Thông báo hệ thống:\n" + (data.message || "Không thể khởi tạo cổng thanh toán."));
+                    resetButton();
+                }
+            } catch (error) {
+                alert("❌ Lỗi kết nối: Không thể gửi yêu cầu đến máy chủ Backend!");
+                resetButton();
+            }
+        }
+
+        function resetButton() {
+            const btnPay = document.getElementById('btnPay');
+            btnPay.disabled = false;
+            btnPay.innerText = "XÁC NHẬN & QUÉT MÃ QR VIA PAYOS";
+            btnPay.classList.replace('bg-slate-400', 'bg-indigo-600');
+        }
+    </script>
+</body>
+</html>

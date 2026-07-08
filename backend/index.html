@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Hệ Thống Quản Lý</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body class="bg-slate-100 min-h-screen font-sans flex flex-col">
+
+    <nav class="bg-white border-b shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center h-16">
+            <div class="flex items-center gap-2">
+                <span class="text-xl">🛡️</span>
+                <span class="font-black text-slate-800 tracking-wide text-sm md:text-base uppercase">Attendance</span>
+            </div>
+
+            <div class="hidden md:flex items-center gap-1 text-sm font-semibold text-slate-600">
+                <button onclick="switchTab('trang-chu')" id="nav-trang-chu" class="px-4 py-2 rounded-xl transition bg-slate-100 text-blue-600">🏠 Trang Chủ</button>
+                <button onclick="switchTab('cham-cong')" id="nav-cham-cong" class="px-4 py-2 rounded-xl transition hover:bg-slate-50">⏱️ Chấm Công</button>
+                <button onclick="switchTab('gia-han')" id="nav-gia-han" class="px-4 py-2 rounded-xl transition hover:bg-slate-50">💳 Gia Hạn</button>
+                <button onclick="switchTab('lich-su')" id="nav-lich-su" class="px-4 py-2 rounded-xl transition hover:bg-slate-50">📜 Lịch Sử</button>
+                <button onclick="switchTab('bao-cao')" id="nav-bao-cao" class="px-4 py-2 rounded-xl transition hover:bg-slate-50">📊 Báo Cáo</button>
+            </div>
+
+            <div class="flex items-center gap-3 text-xs md:text-sm">
+                <div class="text-right">
+                    <p class="font-bold text-slate-700">👋 <span id="txtUser"></span></p>
+                    <p class="text-[10px] text-slate-400 font-medium">Mã công ty: <span id="txtTenant" class="font-bold"></span></p>
+                </div>
+                <button onclick="handleLogout()" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-xl font-bold transition shadow-sm">Đăng xuất</button>
+            </div>
+        </div>
+
+        <div class="md:hidden flex justify-around border-t py-2 bg-slate-50 text-[11px] font-bold text-slate-500">
+            <button onclick="switchTab('trang-chu')" id="mob-trang-chu" class="text-blue-600">Trang Chủ</button>
+            <button onclick="switchTab('cham-cong')" id="mob-cham-cong">Chấm Công</button>
+            <button onclick="switchTab('gia-han')" id="mob-gia-han">Gia Hạn</button>
+            <button onclick="switchTab('lich-su')" id="mob-lich-su">Lịch Sử</button>
+            <button onclick="switchTab('bao-cao')" id="mob-bao-cao">Báo Cáo</button>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl w-full mx-auto p-4 md:p-6 flex-1 flex items-center justify-center">
+
+        <div id="tab-trang-chu" class="tab-content w-full bg-white p-8 rounded-2xl shadow-sm border text-center space-y-4">
+            <div class="text-5xl">🏢</div>
+            <h1 class="text-2xl font-black text-slate-800">Dashboard</h1>
+            <p class="text-sm text-slate-500 max-w-md mx-auto">Vui lòng sử dụng thanh công cụ để thao tác.</p>
+            <div class="pt-2">
+                <button onclick="switchTab('cham-cong')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm">Bắt đầu chấm công</button>
+            </div>
+        </div>
+
+        <div id="tab-cham-cong" class="tab-content hidden w-full max-w-md bg-white p-6 rounded-2xl shadow-sm border space-y-4">
+            <h2 class="text-lg font-bold text-slate-800 border-b pb-2 flex items-center gap-1.5">⏱️ GHI NHẬN CA LÀM VIỆC</h2>
+            <div class="space-y-3">
+                <label class="block text-xs font-bold text-slate-400 uppercase">Chọn trạng thái hiện tại</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="flex items-center justify-center p-3 border rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 font-semibold text-sm transition text-slate-700">
+                        <input type="radio" name="action" value="IN" checked class="mr-2 text-blue-600"> Check-in
+                    </label>
+                    <label class="flex items-center justify-center p-3 border rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 font-semibold text-sm transition text-slate-700">
+                        <input type="radio" name="action" value="OUT" class="mr-2 text-orange-600"> Check-out
+                    </label>
+                </div>
+            </div>
+            <button onclick="triggerAttendance()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl tracking-wide text-sm transition shadow-sm">XÁC NHẬN CHẤM CÔNG</button>
+            <p class="text-[11px] text-slate-400 text-center">Hệ thống sẽ tự động đối soát với địa chỉ Wi-Fi.</p>
+        </div>
+
+        <div id="tab-gia-han" class="tab-content hidden w-full max-w-md bg-white p-6 rounded-2xl shadow-sm border text-center space-y-4">
+            <div class="text-4xl">💳</div>
+            <h2 class="text-lg font-bold text-slate-800">Gói Dịch Vụ</h2>
+            <p class="text-xs text-slate-500">Gia hạn để duy trì trạng thái đồng bộ dữ liệu thời gian thực.</p>
+            <div class="p-4 bg-indigo-50 border border-indigo-100 rounded-xl text-left">
+                <p class="text-xs font-bold text-indigo-800">📦 Gói Gia Hạn</p>
+                <p class="text-xl font-black text-indigo-700 mt-1">50.000 VNĐ <span class="text-xs font-normal text-indigo-500">/ 1 Tháng</span></p>
+            </div>
+            <button onclick="buySaaSPlan()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-sm">THANH TOÁN</button>
+        </div>
+
+        <div id="tab-lich-su" class="tab-content hidden w-full bg-white p-6 rounded-2xl shadow-sm border space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h2 class="font-bold text-slate-800 flex items-center gap-1.5">📜 Lịch Sử</h2>
+                <button onclick="loadHistory()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-lg font-medium transition">🔄 Làm mới</button>
+            </div>
+            <div id="historyContainer" class="overflow-y-auto max-h-[350px] space-y-2 pr-1 text-xs min-h-[150px]"></div>
+        </div>
+
+        <div id="tab-bao-cao" class="tab-content hidden w-full max-w-md bg-white p-6 rounded-2xl shadow-sm border text-center space-y-4">
+            <div class="text-4xl">📊</div>
+            <h2 class="text-lg font-bold text-slate-800">Xuất Báo Cáo</h2>
+            <p class="text-xs text-slate-500">Hệ thống tổng hợp toàn bộ dữ liệu chấm công của tháng.</p>
+            <div class="flex gap-2 pt-2">
+                <input id="exportMonth" type="month" class="flex-1 px-3 py-2.5 border rounded-xl text-sm bg-slate-50 focus:outline-none focus:border-blue-500">
+                <button onclick="exportToExcel()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition shadow-sm">Tải File Excel</button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const API_BASE = "http://localhost:3000";
+        let currentUser = null;
+        let authToken = null;
+        let socket = null;
+
+        function timeAgo(timestamp) {
+            const now = new Date();
+            const past = new Date(timestamp);
+            const msPerMinute = 60 * 1000;
+            const msPerHour = msPerMinute * 60;
+            const msPerDay = msPerHour * 24;
+
+            const elapsed = now - past;
+
+            if (elapsed < 0) return "Vừa xong";
+
+            if (elapsed < msPerMinute) {
+                const seconds = Math.round(elapsed / 1000);
+                return seconds <= 5 ? "Vừa xong" : `${seconds} giây trước`;
+            } else if (elapsed < msPerHour) {
+                return `${Math.round(elapsed / msPerMinute)} phút trước`;
+            } else if (elapsed < msPerDay) {
+                return `${Math.round(elapsed / msPerHour)} giờ trước`;
+            } else {
+                return past.toLocaleDateString('vi-VN');
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('nav div button').forEach(btn => btn.classList.remove('bg-slate-100', 'text-blue-600'));
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if (activeBtn) activeBtn.classList.add('bg-slate-100', 'text-blue-600');
+
+            document.querySelectorAll('.md\\:hidden button').forEach(btn => btn.classList.remove('text-blue-600'));
+            const activeMobBtn = document.getElementById(`mob-${tabId}`);
+            if (activeMobBtn) activeMobBtn.classList.add('text-blue-600');
+
+            if (tabId === 'lich-su') {
+                loadHistory();
+            }
+        }
+
+        window.onload = function() {
+            const savedUser = localStorage.getItem('logged_user');
+            const savedToken = localStorage.getItem('auth_token');
+            
+            if (!savedUser || !savedToken) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            currentUser = JSON.parse(savedUser);
+            authToken = savedToken;
+
+            document.getElementById('txtUser').innerText = currentUser.fullName || currentUser.userId;
+            document.getElementById('txtTenant').innerText = currentUser.tenantId;
+            
+            initRealtime();
+        };
+
+        function initRealtime() {
+            try {
+                socket = io(API_BASE, {
+                    auth: { token: authToken }
+                });
+
+                socket.emit('join_company', currentUser.tenantId);
+                
+                socket.on('new_attendance_alert', () => {
+                    if (!document.getElementById('tab-lich-su').classList.contains('hidden')) {
+                        loadHistory();
+                    }
+                });
+            } catch (error) {
+                console.error("Lỗi kênh Real-time:", error);
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('logged_user');
+            localStorage.removeItem('auth_token');
+            window.location.href = "login.html";
+        }
+
+        async function triggerAttendance() {
+            const actionType = document.querySelector('input[name="action"]:checked').value;
+            try {
+                const res = await fetch(`${API_BASE}/attendance/check-in`, {
+                    method: 'POST', 
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }, 
+                    body: JSON.stringify({ wifiBssid: "00:1a:2b:3c:4d:5e", actionType })
+                });
+                const data = await res.json();
+                
+                alert(data.message); 
+                
+                if (res.ok) {
+                    switchTab('lich-su');
+                }
+            } catch (error) {
+                alert("Lỗi kết nối API chấm công bảo mật!");
+            }
+        }
+
+        async function loadHistory() {
+            const container = document.getElementById('historyContainer');
+            container.innerHTML = "<p class='text-slate-400 italic text-center py-4'>Đang kết nối đám mây...</p>";
+            
+            try {
+                const res = await fetch(`${API_BASE}/attendance/history`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    container.innerHTML = `<p class='text-red-500 text-center py-4'>Lỗi: ${data.message}</p>`;
+                    return;
+                }
+                if (!data.history || data.history.length === 0) {
+                    container.innerHTML = "<p class='text-slate-400 italic text-center py-4'>Không có dữ liệu.</p>";
+                    return;
+                }
+
+                const sortedHistory = data.history.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
+
+                container.innerHTML = sortedHistory.map(item => `
+                    <div class="p-3 bg-slate-50 border rounded-xl flex justify-between items-center mb-2 transition hover:bg-slate-100">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold ${item.Action === 'CHECKIN' ? 'text-emerald-600' : 'text-orange-600'}">
+                                    ${item.Action === 'CHECKIN' ? 'VÀO CA (CHECK-IN)' : 'RA CA (CHECK-OUT)'}
+                                </span>
+                                <span class="text-[11px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-md font-semibold">
+                                    🕒 ${timeAgo(item.Timestamp)}
+                                </span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 font-mono mt-1">
+                                Chi tiết: ${new Date(item.Timestamp).toLocaleString('vi-VN')}
+                            </p>
+                        </div>
+                        <span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-[10px] font-bold">${item.DeviceVerified}</span>
+                    </div>
+                `).join('');
+            } catch (e) {
+                container.innerHTML = "<p class='text-red-500 text-center py-4'>Không thể tải lịch sử an toàn!</p>";
+            }
+        }
+
+        function exportToExcel() {
+            const monthVal = document.getElementById('exportMonth').value;
+            if (!monthVal) {
+                alert("Vui lòng chọn tháng cụ thể muốn tải dữ liệu báo cáo!");
+                return;
+            }
+
+            fetch(`${API_BASE}/attendance/export/${monthVal}`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            })
+            .then(async res => {
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `BaoCao_ChamCong_${monthVal}.xlsx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                } else {
+                    alert("Yêu cầu bị từ chối! Bạn không đủ thẩm quyền tải tệp tin này.");
+                }
+            })
+            .catch(() => alert("Lỗi tải tệp báo cáo!"));
+        }
+
+        async function buySaaSPlan() {
+            try {
+                const res = await fetch(`${API_BASE}/billing/create-payment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ amount: 50000, packageName: "Gói tháng doanh nghiệp" })
+                });
+                const data = await res.json();
+                if (res.ok && data.checkoutUrl) {
+                    window.location.href = data.checkoutUrl;
+                } else {
+                    alert(data.message || "Lỗi tạo link thanh toán!");
+                }
+            } catch (e) {
+                alert("Lỗi kết nối PayOS bảo mật!");
+            }
+        }
+    </script>
+</body>
+</html>
