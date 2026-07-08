@@ -1,20 +1,115 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Smart Attendance SaaS - Ha tang Serverless co ban
+Description: SaaS Attendance Full Serverless Platform
 
 Resources:
+  # 1. Database
+  SaaSAttendanceTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: PK
+        Type: String
 
-  HelloWorldFunction:
+  # 2. Storage
+  SaaSReportBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "saas-attendance-reports-${AWS::AccountId}-${AWS::Region}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # 3. Notification Queue
+  ReportQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 300
+
+  # 4. API Gateway
+  AttendanceApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: prod
+      CorsConfiguration:
+        AllowMethods:
+          - POST
+          - GET
+          - PATCH
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+        AllowOrigins:
+          - "*"
+
+  # 5. Functions
+  CheckInFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/                  
-      Handler: app.handler           
-      Runtime: nodejs20.x            
-      Timeout: 10                    
+      CodeUri: src/
+      Handler: handler/attendance/checkin.handler
+      Runtime: nodejs18.x
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref SaaSAttendanceTable
       Events:
-        
-        HelloWorldAPI:
-          Type: Api
+        CheckInApi:
+          Type: HttpApi
           Properties:
-            Path: /hello             
-            Method: get              
+            Path: /attendance/check-in
+            Method: post
+            ApiId: !Ref AttendanceApi
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SaaSAttendanceTable
+
+  UpdateProfileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handler/profile/update.handler
+      Runtime: nodejs18.x
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref SaaSAttendanceTable
+      Events:
+        UpdateApi:
+          Type: HttpApi
+          Properties:
+            Path: /profile/update
+            Method: patch
+            ApiId: !Ref AttendanceApi
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref SaaSAttendanceTable
+
+  ExportReportFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handler/reports/export.handler
+      Runtime: nodejs18.x
+      Timeout: 300
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref SaaSAttendanceTable
+          REPORT_BUCKET: !Ref SaaSReportBucket
+      Events:
+        SQSTrigger:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt ReportQueue.Arn
+            BatchSize: 1
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref SaaSAttendanceTable
+        - S3CrudPolicy:
+            BucketName: !Ref SaaSReportBucket
+
+Outputs:
+  AttendanceApiUrl:
+    Description: "Link API Endpoint"
+    Value: !Sub "https://${AttendanceApi}.execute-api.${AWS::Region}.amazonaws.com/prod"
