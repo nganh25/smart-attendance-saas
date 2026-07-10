@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <title>Đăng nhập hệ thống - SaaS Attendance</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
 
     <div class="bg-white p-8 rounded-2xl shadow-sm border max-w-md w-full space-y-6">
         <div class="text-center space-y-2">
-            <h1 class="text-xl font-black text-slate-800 tracking-wide uppercase flex items-center justify-center gap-2">
+            <h1
+                class="text-xl font-black text-slate-800 tracking-wide uppercase flex items-center justify-center gap-2">
                 🔑 ĐĂNG NHẬP HỆ THỐNG
             </h1>
             <p class="text-xs text-slate-400">Vui lòng điền thông tin</p>
@@ -18,30 +21,31 @@
         <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-4">
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Mã Công ty (Tenant ID)</label>
-                <input id="tenantId" type="text" required placeholder="Ví dụ: 123" 
+                <input id="tenantId" type="text" required placeholder="Ví dụ: 123"
                     class="w-full px-3 py-2.5 border rounded-xl text-sm bg-slate-50 focus:outline-none focus:border-blue-500 transition">
             </div>
 
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Mã Nhân viên (User ID)</label>
-                <input id="userId" type="text" required placeholder="Ví dụ: nv01" 
+                <input id="userId" type="text" required placeholder="Ví dụ: nv01"
                     class="w-full px-3 py-2.5 border rounded-xl text-sm bg-slate-50 focus:outline-none focus:border-blue-500 transition">
             </div>
 
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Mật khẩu</label>
-                <input id="password" type="password" required placeholder="••••••••" 
+                <input id="password" type="password" required placeholder="••••••••"
                     class="w-full px-3 py-2.5 border rounded-xl text-sm bg-slate-50 focus:outline-none focus:border-blue-500 transition">
             </div>
 
-            <button type="submit" 
+            <button type="submit"
                 class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm tracking-wide transition shadow-sm">
                 ĐĂNG NHẬP
             </button>
         </form>
 
         <div class="text-center pt-2">
-            <p class="text-xs text-slate-400">Chưa có tài khoản? <a href="register.html" class="text-blue-500 font-semibold hover:underline">Đăng ký tại đây</a></p>
+            <p class="text-xs text-slate-400">Chưa có tài khoản? <a href="register.html"
+                    class="text-blue-500 font-semibold hover:underline">Đăng ký tại đây</a></p>
         </div>
     </div>
 
@@ -49,7 +53,7 @@
         const API_BASE = "http://localhost:3000";
 
         async function handleLoginSubmit(event) {
-            event.preventDefault(); 
+            event.preventDefault();
 
             const tenantId = document.getElementById('tenantId').value.trim();
             const userId = document.getElementById('userId').value.trim();
@@ -69,7 +73,7 @@
                     return;
                 }
                 localStorage.setItem('logged_user', JSON.stringify(data.user));
-                localStorage.setItem('auth_token', data.token); //
+                localStorage.setItem('auth_token', data.token);
                 window.location.href = "index.html";
 
             } catch (error) {
@@ -77,11 +81,12 @@
                 alert("Không thể kết nối đến máy chủ Backend!");
             }
         }
-        window.onload = function() {
+        window.onload = function () {
             if (localStorage.getItem('logged_user') && localStorage.getItem('auth_token')) {
                 window.location.href = "index.html";
             }
         }
     </script>
 </body>
+
 </html>
