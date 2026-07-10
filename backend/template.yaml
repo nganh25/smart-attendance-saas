@@ -2,50 +2,587 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: SaaS Attendance Full Serverless Platform
 
-Resources:
-  # 1. Database
-  SaaSAttendanceTable:
-    Type: AWS::Serverless::SimpleTable
-    Properties:
-      PrimaryKey:
-        Name: PK
-        Type: String
+Parameters:
+  AllowedOrigin:
+    Type: String
+    Default: "https://your-cloudfront-domain.cloudfront.net"
+    Description: Allowed origin for CORS response header
 
-  # 2. Storage
+Resources:
+  # ─── Cognito User Pool ───
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: smart-attendance-user-pool
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 12
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+      MfaConfiguration: OPTIONAL
+      EnabledMfas:
+        - SOFTWARE_TOKEN_MFA
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+      UserPoolAddOns:
+        AdvancedSecurityMode: ENFORCED
+      Schema:
+        - Name: tenantId
+          AttributeDataType: String
+          Mutable: false
+          Required: false
+        - Name: role
+          AttributeDataType: String
+          Mutable: true
+          Required: false
+
+  # ─── Cognito App Client ───
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: smart-attendance-app-client
+      UserPoolId: !Ref CognitoUserPool
+      GenerateSecret: false
+      AccessTokenValidity: 15
+      IdTokenValidity: 15
+      RefreshTokenValidity: 7
+      TokenValidityUnits:
+        AccessToken: minutes
+        IdToken: minutes
+        RefreshToken: days
+      ExplicitAuthFlows:
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      PreventUserExistenceErrors: ENABLED
+
+  # ─── HTTP API Gateway with JWT Authorizer ───
+  AttendanceApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: prod
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            AuthorizationScopes:
+              - openid
+            IdentitySource: $request.header.Authorization
+            JwtConfiguration:
+              issuer: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}'
+              audience:
+                - !Ref CognitoUserPoolClient
+      CorsConfiguration:
+        AllowOrigins:
+          - !Ref AllowedOrigin
+        AllowMethods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - Authorization
+          - Content-Type
+        MaxAge: 300
+
+  # ─── WAF v2 Web ACL ───
+  ApiWAF:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      Name: smart-attendance-api-waf
+      Scope: REGIONAL
+      DefaultAction:
+        Allow: {}
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: SmartAttendanceWAF
+      Rules:
+        # Rule 1: Rate Limiting
+        - Name: RateLimitRule
+          Priority: 1
+          Action:
+            Block: {}
+          Statement:
+            RateBasedStatement:
+              Limit: 1000
+              AggregateKeyType: IP
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: RateLimitRule
+        # Rule 2: Managed Core Rule Set
+        - Name: AWSManagedRulesCommonRuleSet
+          Priority: 2
+          OverrideAction:
+            None: {}
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesCommonRuleSet
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: CommonRuleSet
+        # Rule 3: Known Bad Inputs
+        - Name: AWSManagedRulesKnownBadInputsRuleSet
+          Priority: 3
+          OverrideAction:
+            None: {}
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesKnownBadInputsRuleSet
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: KnownBadInputs
+
+  # ─── WAF association with API Gateway ───
+  ApiWafAssociation:
+    Type: AWS::WAFv2::WebACLAssociation
+    Properties:
+      ResourceArn: !Sub 'arn:aws:apigateway:${AWS::Region}::/apis/${AttendanceApi}/stages/prod'
+      WebACLArn: !GetAtt ApiWAF.Arn
+
+  # ─── Security Notifications ───
+  SecurityAlertsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: smart-attendance-security-alerts
+
+  # ─── API Gateway 4XX client error rate alarm ───
+  Api4XXErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: smart-attendance-api-4xx-error-spike
+      AlarmDescription: Triggered when client failures (e.g. 401 Unauthorized, 403 Forbidden) exceed threshold
+      Namespace: AWS/ApiGateway
+      MetricName: 4XXError
+      Dimensions:
+        - Name: ApiId
+          Value: !Ref AttendanceApi
+        - Name: Stage
+          Value: prod
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 10
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      AlarmActions:
+        - !Ref SecurityAlertsTopic
+
+  # ─── HelloWorld Lambda execution error alarm ───
+  LambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: smart-attendance-hello-lambda-errors
+      AlarmDescription: Triggered when Lambda runtime errors exceed safe threshold
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref HelloWorldFunction
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 2
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      AlarmActions:
+        - !Ref SecurityAlertsTopic
+
+  # ─── KMS Key for Data Encryption ───
+  DataKMSKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: CMK key for Smart Attendance database and S3 encryption
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable IAM Policies
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action: 'kms:*'
+            Resource: '*'
+
+  # ─── DynamoDB Database (Single-Table Design) ───
+  SaaSAttendanceTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: smart-attendance-database
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      SSESpecification:
+        SSEEnabled: true
+        SSEType: KMS
+        KMSMasterKeyId: !Ref DataKMSKey
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  # ─── S3 Report Storage Bucket ───
   SaaSReportBucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "saas-attendance-reports-${AWS::AccountId}-${AWS::Region}"
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
-        BlockPublicPolicy: true
         IgnorePublicAcls: true
+        BlockPublicPolicy: true
         RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: 'aws:kms'
+              KMSMasterKeyID: !Ref DataKMSKey
+            BucketKeyEnabled: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: IntelligentTieringRule
+            Status: Enabled
+            Transitions:
+              - TransitionInDays: 0
+                StorageClass: INTELLIGENT_TIERING
 
-  # 3. Notification Queue
+  # ─── S3 Report Bucket Policy (Force SSL) ───
+  SaaSReportBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SaaSReportBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: ForceSSLOnlyAccess
+            Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource:
+              - !Sub 'arn:aws:s3:::${SaaSReportBucket}'
+              - !Sub 'arn:aws:s3:::${SaaSReportBucket}/*'
+            Condition:
+              Bool:
+                'aws:SecureTransport': 'false'
+
+  # ─── SQS Dead Letter Queue (DLQ) ───
+  EmailDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: smart-attendance-email-dlq
+      KmsMasterKeyId: alias/aws/sqs
+
+  # ─── SQS Primary Email Queue ───
+  EmailQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: smart-attendance-email-queue
+      KmsMasterKeyId: alias/aws/sqs
+      VisibilityTimeout: 30
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt EmailDLQ.Arn
+        maxReceiveCount: 3
+
+  # ─── Notification Queue for Reports ───
   ReportQueue:
     Type: AWS::SQS::Queue
     Properties:
       VisibilityTimeout: 300
 
-  # 4. API Gateway
-  AttendanceApi:
-    Type: AWS::Serverless::HttpApi
+  # ─── Lambda Email Worker Function ───
+  EmailWorkerFunction:
+    Type: AWS::Serverless::Function
     Properties:
-      StageName: prod
-      CorsConfiguration:
-        AllowMethods:
-          - POST
-          - GET
-          - PATCH
-          - OPTIONS
-        AllowHeaders:
-          - Content-Type
-          - Authorization
-        AllowOrigins:
-          - "*"
+      CodeUri: src/
+      Handler: emailWorker.handler
+      Runtime: nodejs20.x
+      Timeout: 15
+      Tracing: Active
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*:*'
+            - Effect: Allow
+              Action:
+                - sqs:ReceiveMessage
+                - sqs:DeleteMessage
+                - sqs:GetQueueAttributes
+              Resource: !GetAtt EmailQueue.Arn
+            - Effect: Allow
+              Action:
+                - ses:SendEmail
+                - ses:SendRawEmail
+              Resource: '*'
+      Environment:
+        Variables:
+          SENDER_EMAIL: "noreply@your-domain.com"
+      Events:
+        SQSTrigger:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt EmailQueue.Arn
+            BatchSize: 5
 
-  # 5. Functions
+  # ─── Step Functions IAM Execution Role ───
+  ReportWorkflowRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Sub 'states.${AWS::Region}.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: ReportWorkflowPermissions
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogDelivery
+                  - logs:GetLogDelivery
+                  - logs:UpdateLogDelivery
+                  - logs:DeleteLogDelivery
+                  - logs:ListLogDeliveries
+                  - logs:PutResourcePolicy
+                  - logs:DescribeResourcePolicies
+                  - logs:DescribeLogGroups
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                Resource: !Sub 'arn:aws:s3:::${SaaSReportBucket}/*'
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                Resource: !GetAtt SaaSAttendanceTable.Arn
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                  - kms:GenerateDataKey
+                Resource: !GetAtt DataKMSKey.Arn
+
+  # ─── Step Functions Express Workflow ───
+  ReportStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Definition:
+        StartAt: ValidateRequest
+        States:
+          ValidateRequest:
+            Type: Pass
+            Result:
+              Status: "VALIDATED"
+            ResultPath: "$.validation"
+            Next: InitializeReportStatus
+          InitializeReportStatus:
+            Type: Task
+            Resource: !Sub 'arn:aws:states:::dynamodb:putItem'
+            Parameters:
+              TableName: !Ref SaaSAttendanceTable
+              Item:
+                PK:
+                  S.$: '$.PK'
+                SK:
+                  S.$: '$.SK'
+                Status:
+                  S: "PROCESSING"
+            Next: GenerateReportFile
+          GenerateReportFile:
+            Type: Pass
+            Result:
+              S3Key: "reports/temp-report.pdf"
+            ResultPath: "$.fileDetails"
+            Next: WriteFileToS3
+          WriteFileToS3:
+            Type: Task
+            Resource: !Sub 'arn:aws:states:::s3:putObject'
+            Parameters:
+              Bucket: !Ref SaaSReportBucket
+              Key.$: '$.fileDetails.S3Key'
+              Body: "Attendance Report Content Placeholder"
+            Next: FinalizeReportStatus
+          FinalizeReportStatus:
+            Type: Task
+            Resource: !Sub 'arn:aws:states:::dynamodb:updateItem'
+            Parameters:
+              TableName: !Ref SaaSAttendanceTable
+              Key:
+                PK:
+                  S.$: '$.PK'
+                SK:
+                  S.$: '$.SK'
+              UpdateExpression: "SET #status = :val, #file = :file"
+              ExpressionAttributeNames:
+                "#status": "Status"
+                "#file": "ReportFileKey"
+              ExpressionAttributeValues:
+                ":val":
+                  S: "COMPLETED"
+                ":file":
+                  S.$: '$.fileDetails.S3Key'
+            End: true
+      Role: !GetAtt ReportWorkflowRole.Arn
+      Type: EXPRESS
+      Logging:
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/vendedlogs/states/*'
+        Level: ALL
+
+  # ─── EventBridge Pipe Execution Role ───
+  StreamPipeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: pipes.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: PipeExecutionPermissions
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:DescribeStream
+                  - dynamodb:GetRecords
+                  - dynamodb:GetShardIterator
+                  - dynamodb:ListStreams
+                Resource: !GetAtt SaaSAttendanceTable.StreamArn
+              - Effect: Allow
+                Action:
+                  - events:PutEvents
+                Resource: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
+
+  # ─── EventBridge Pipe: DynamoDB to EventBridge ───
+  DdbToEventBridgePipe:
+    Type: AWS::Pipes::Pipe
+    Properties:
+      Name: smart-attendance-ddb-stream-pipe
+      RoleArn: !GetAtt StreamPipeRole.Arn
+      Source: !GetAtt SaaSAttendanceTable.StreamArn
+      SourceParameters:
+        DynamoDBStreamParameters:
+          StartingPosition: LATEST
+          BatchSize: 1
+      Target: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
+
+  # ─── Webhook Credentials Secret ───
+  WebhookSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: smart-attendance-webhook-credentials
+      Description: API keys and validation tokens for webhooks
+      KmsKeyId: !Ref DataKMSKey
+      GenerateSecretString:
+        SecretStringTemplate: '{"PaymentWebhookSignatureKey": "placeholder-token"}'
+        GenerateStringKey: "SessionKey"
+
+  # ─── S3 React SPA Hosting Bucket ───
+  SpaBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'smart-attendance-spa-hosting-${AWS::AccountId}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: 'aws:kms'
+              KMSMasterKeyID: !Ref DataKMSKey
+            BucketKeyEnabled: true
+
+  # ─── CloudFront Origin Access Control (OAC) ───
+  SpaOriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: smart-attendance-spa-oac
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  # ─── CloudFront CDN Distribution ───
+  SpaDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: index.html
+        Origins:
+          - Id: SpaS3Origin
+            DomainName: !GetAtt SpaBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt SpaOriginAccessControl.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+        DefaultCacheBehavior:
+          TargetOriginId: SpaS3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachedMethods:
+            - GET
+            - HEAD
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+
+  # ─── S3 SPA Bucket Policy (OAC Access Only) ───
+  SpaBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SpaBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontOACRead
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: 's3:GetObject'
+            Resource: !Sub 'arn:aws:s3:::${SpaBucket}/*'
+            Condition:
+              StringEquals:
+                'AWS:SourceArn': !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${SpaDistribution}'
+
+  # ─── Functions ───
   CheckInFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -108,6 +645,34 @@ Resources:
             TableName: !Ref SaaSAttendanceTable
         - S3CrudPolicy:
             BucketName: !Ref SaaSReportBucket
+
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handler/hello.handler
+      Runtime: nodejs20.x
+      Timeout: 10
+      Tracing: Active
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*:*'
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: !Ref AllowedOrigin
+      Events:
+        HelloWorldAPI:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AttendanceApi
+            Path: /hello
+            Method: get
 
 Outputs:
   AttendanceApiUrl:

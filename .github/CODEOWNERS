@@ -1,0 +1,14 @@
+# ─── Security reviews all infra and auth changes ───
+backend/template.yaml          *
+backend/buildspec.yml          *
+backend/src/app.js             *
+*.yaml                         *
+
+# ─── Backend team ───
+backend/src/                   *
+
+# ─── Frontend team ───
+frontend/src/                  *
+
+# ─── DevOps team ───
+.github/                       *

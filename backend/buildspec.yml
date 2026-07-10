@@ -1,0 +1,26 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      # Install python dependencies for CloudFormation scanning
+      - pip install cfn-lint checkov
+      # Install project dependencies
+      - cd backend && npm ci
+  pre_build:
+    commands:
+      # Run dependency security checks
+      - npm audit --audit-level=high
+      # Run CloudFormation structure linter
+      - cfn-lint template.yaml
+      # Run static analysis check against CloudFormation configurations
+      - checkov -f template.yaml --framework cloudformation
+  build:
+    commands:
+      # Run SAM build
+      - sam build
+artifacts:
+  files:
+    - backend/template.yaml
