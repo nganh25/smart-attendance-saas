@@ -8,7 +8,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken'); 
 const rateLimit = require('express-rate-limit'); 
 
-const { PutCommand, GetCommand, ScanCommand } = require("@aws-sdk/lib-dynamodb");
+const { PutCommand, GetCommand, ScanCommand, QueryCommand } = require("@aws-sdk/lib-dynamodb");
 const { ddbDocClient } = require("./src/shared/database");
 
 const app = express();
@@ -28,7 +28,7 @@ const registerLimiter = rateLimit({
     message: { message: "Bạn đã yêu cầu quá nhiều mã OTP. Vui lòng thử lại sau 15 phút!" }
 });
 
-process.env.DYNAMODB_TABLE = "saas-attendance-backend-SaaSAttendanceTable-3BHJ8COS7E16"; 
+process.env.DYNAMODB_TABLE = "smart-attendance-database"; 
 const TABLE_NAME = process.env.DYNAMODB_TABLE;
 
 const payos = new PayOS({
@@ -100,7 +100,8 @@ app.post('/auth/register/verify', async (req, res) => {
 
     try {
         const userRecord = {
-            PK: `TENANT#${cachedData.tenantId}#USER#${cachedData.userId}#METADATA`, 
+            PK: `TENANT#${cachedData.tenantId}`, 
+            SK: `USER#${cachedData.userId}#METADATA`, 
             Password: cachedData.password, 
             FullName: cachedData.fullName || cachedData.userId,
             Email: cachedData.email,
@@ -122,7 +123,10 @@ app.post('/auth/login', async (req, res) => {
     try {
         const result = await ddbDocClient.send(new GetCommand({
             TableName: TABLE_NAME,
-            Key: { PK: `TENANT#${tenantId}#USER#${userId}#METADATA` }
+            Key: {
+                PK: `TENANT#${tenantId}`,
+                SK: `USER#${userId}#METADATA`
+            }
         }));
 
         if (!result.Item) {
@@ -161,7 +165,8 @@ app.post('/attendance/check-in', authenticateToken, async (req, res) => {
 
     try {
         const attendanceRecord = {
-            PK: `TENANT#${tenantId}#USER#${userId}#ATTENDANCE#${currentDate}#${currentType}`,
+            PK: `TENANT#${tenantId}`,
+            SK: `USER#${userId}#ATTENDANCE#${currentDate}#${currentType}`,
             UserId: userId, Timestamp: timestamp, Action: currentType, DeviceVerified: "Wi-Fi Office", Status: "SUCCESS"
         };
         await ddbDocClient.send(new PutCommand({ TableName: TABLE_NAME, Item: attendanceRecord }));
@@ -176,11 +181,13 @@ app.post('/attendance/check-in', authenticateToken, async (req, res) => {
 app.get('/attendance/history', authenticateToken, async (req, res) => {
     const { tenantId, userId } = req.user; 
     try {
-        const result = await ddbDocClient.send(new ScanCommand({
+        const result = await ddbDocClient.send(new QueryCommand({
             TableName: TABLE_NAME,
-            FilterExpression: "begins_with(#pk, :pk_prefix)",
-            ExpressionAttributeNames: { "#pk": "PK" },
-            ExpressionAttributeValues: { ":pk_prefix": `TENANT#${tenantId}#USER#${userId}#ATTENDANCE#` }
+            KeyConditionExpression: "PK = :pk AND begins_with(SK, :sk_prefix)",
+            ExpressionAttributeValues: {
+                ":pk": `TENANT#${tenantId}`,
+                ":sk_prefix": `USER#${userId}#ATTENDANCE#`
+            }
         }));
         res.status(200).json({ history: result.Items || [] });
     } catch (error) {
@@ -191,14 +198,16 @@ app.get('/attendance/export/:yearMonth', authenticateToken, async (req, res) => 
     const { tenantId } = req.user;
     const { yearMonth } = req.params;
     try {
-        const result = await ddbDocClient.send(new ScanCommand({
+        const result = await ddbDocClient.send(new QueryCommand({
             TableName: TABLE_NAME,
-            FilterExpression: "begins_with(#pk, :pk_prefix)",
-            ExpressionAttributeNames: { "#pk": "PK" },
-            ExpressionAttributeValues: { ":pk_prefix": `TENANT#${tenantId}#USER#` }
+            KeyConditionExpression: "PK = :pk AND begins_with(SK, :sk_prefix)",
+            ExpressionAttributeValues: {
+                ":pk": `TENANT#${tenantId}`,
+                ":sk_prefix": "USER#"
+            }
         }));
 
-        const monthlyRecords = (result.Items || []).filter(item => item.PK.includes(`#ATTENDANCE#${yearMonth}`));
+        const monthlyRecords = (result.Items || []).filter(item => item.SK.includes(`#ATTENDANCE#${yearMonth}`));
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet(`Báo Cáo ${yearMonth}`);
 
@@ -245,7 +254,8 @@ app.post('/billing/create-payment', authenticateToken, async (req, res) => {
         await ddbDocClient.send(new PutCommand({
             TableName: TABLE_NAME,
             Item: {
-                PK: `TENANT#${tenantId}#BILLING#ORDER#${orderCode}`,
+                PK: `TENANT#${tenantId}`,
+                SK: `BILLING#ORDER#${orderCode}`,
                 Amount: amount, Package: packageName, Status: "PENDING", CreatedAt: new Date().toISOString()
             }
         }));

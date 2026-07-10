@@ -7,6 +7,11 @@ Parameters:
     Type: String
     Default: "https://your-cloudfront-domain.cloudfront.net"
     Description: Allowed origin for CORS response header
+  OriginVerifySecret:
+    Type: String
+    Default: "SaaS-Secure-Verification-Token-2026"
+    Description: Custom secret header to verify requests originate from CloudFront
+
 
 Resources:
   # ─── Cognito User Pool ───
@@ -91,64 +96,64 @@ Resources:
         MaxAge: 300
 
   # ─── WAF v2 Web ACL ───
-  ApiWAF:
-    Type: AWS::WAFv2::WebACL
-    Properties:
-      Name: smart-attendance-api-waf
-      Scope: REGIONAL
-      DefaultAction:
-        Allow: {}
-      VisibilityConfig:
-        SampledRequestsEnabled: true
-        CloudWatchMetricsEnabled: true
-        MetricName: SmartAttendanceWAF
-      Rules:
-        # Rule 1: Rate Limiting
-        - Name: RateLimitRule
-          Priority: 1
-          Action:
-            Block: {}
-          Statement:
-            RateBasedStatement:
-              Limit: 1000
-              AggregateKeyType: IP
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: RateLimitRule
-        # Rule 2: Managed Core Rule Set
-        - Name: AWSManagedRulesCommonRuleSet
-          Priority: 2
-          OverrideAction:
-            None: {}
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesCommonRuleSet
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: CommonRuleSet
-        # Rule 3: Known Bad Inputs
-        - Name: AWSManagedRulesKnownBadInputsRuleSet
-          Priority: 3
-          OverrideAction:
-            None: {}
-          Statement:
-            ManagedRuleGroupStatement:
-              VendorName: AWS
-              Name: AWSManagedRulesKnownBadInputsRuleSet
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: KnownBadInputs
+  # ApiWAF:
+  #   Type: AWS::WAFv2::WebACL
+  #   Properties:
+  #     Name: smart-attendance-api-waf
+  #     Scope: REGIONAL
+  #     DefaultAction:
+  #       Allow: {}
+  #     VisibilityConfig:
+  #       SampledRequestsEnabled: true
+  #       CloudWatchMetricsEnabled: true
+  #       MetricName: SmartAttendanceWAF
+  #     Rules:
+  #       # Rule 1: Rate Limiting
+  #       - Name: RateLimitRule
+  #         Priority: 1
+  #         Action:
+  #           Block: {}
+  #         Statement:
+  #           RateBasedStatement:
+  #             Limit: 1000
+  #             AggregateKeyType: IP
+  #         VisibilityConfig:
+  #           SampledRequestsEnabled: true
+  #           CloudWatchMetricsEnabled: true
+  #           MetricName: RateLimitRule
+  #       # Rule 2: Managed Core Rule Set
+  #       - Name: AWSManagedRulesCommonRuleSet
+  #         Priority: 2
+  #         OverrideAction:
+  #           None: {}
+  #         Statement:
+  #           ManagedRuleGroupStatement:
+  #             VendorName: AWS
+  #             Name: AWSManagedRulesCommonRuleSet
+  #         VisibilityConfig:
+  #           SampledRequestsEnabled: true
+  #           CloudWatchMetricsEnabled: true
+  #           MetricName: CommonRuleSet
+  #       # Rule 3: Known Bad Inputs
+  #       - Name: AWSManagedRulesKnownBadInputsRuleSet
+  #         Priority: 3
+  #         OverrideAction:
+  #           None: {}
+  #         Statement:
+  #           ManagedRuleGroupStatement:
+  #             VendorName: AWS
+  #             Name: AWSManagedRulesKnownBadInputsRuleSet
+  #         VisibilityConfig:
+  #           SampledRequestsEnabled: true
+  #           CloudWatchMetricsEnabled: true
+  #           MetricName: KnownBadInputs
 
   # ─── WAF association with API Gateway ───
-  ApiWafAssociation:
-    Type: AWS::WAFv2::WebACLAssociation
-    Properties:
-      ResourceArn: !Sub 'arn:aws:apigateway:${AWS::Region}::/apis/${AttendanceApi}/stages/prod'
-      WebACLArn: !GetAtt ApiWAF.Arn
+  # ApiWafAssociation:
+  #   Type: AWS::WAFv2::WebACLAssociation
+  #   Properties:
+  #     ResourceArn: !Sub 'arn:aws:apigateway:${AWS::Region}::/apis/${AttendanceApi}/stages/prod'
+  #     WebACLArn: !GetAtt ApiWAF.Arn
 
   # ─── Security Notifications ───
   SecurityAlertsTopic:
@@ -421,7 +426,7 @@ Resources:
             Next: WriteFileToS3
           WriteFileToS3:
             Type: Task
-            Resource: !Sub 'arn:aws:states:::s3:putObject'
+            Resource: !Sub 'arn:aws:states:::aws-sdk:s3:putObject'
             Parameters:
               Bucket: !Ref SaaSReportBucket
               Key.$: '$.fileDetails.S3Key'
@@ -449,11 +454,11 @@ Resources:
             End: true
       Role: !GetAtt ReportWorkflowRole.Arn
       Type: EXPRESS
-      Logging:
-        Destinations:
-          - CloudWatchLogsLogGroup:
-              LogGroupArn: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/vendedlogs/states/*'
-        Level: ALL
+      # Logging:
+      #   Destinations:
+      #     - CloudWatchLogsLogGroup:
+      #         LogGroupArn: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/vendedlogs/states/*'
+      #   Level: ALL
 
   # ─── EventBridge Pipe Execution Role ───
   StreamPipeRole:
@@ -525,62 +530,91 @@ Resources:
             BucketKeyEnabled: true
 
   # ─── CloudFront Origin Access Control (OAC) ───
-  SpaOriginAccessControl:
-    Type: AWS::CloudFront::OriginAccessControl
-    Properties:
-      OriginAccessControlConfig:
-        Name: smart-attendance-spa-oac
-        OriginAccessControlOriginType: s3
-        SigningBehavior: always
-        SigningProtocol: sigv4
-
-  # ─── CloudFront CDN Distribution ───
-  SpaDistribution:
-    Type: AWS::CloudFront::Distribution
-    Properties:
-      DistributionConfig:
-        Enabled: true
-        DefaultRootObject: index.html
-        Origins:
-          - Id: SpaS3Origin
-            DomainName: !GetAtt SpaBucket.RegionalDomainName
-            OriginAccessControlId: !GetAtt SpaOriginAccessControl.Id
-            S3OriginConfig:
-              OriginAccessIdentity: ""
-        DefaultCacheBehavior:
-          TargetOriginId: SpaS3Origin
-          ViewerProtocolPolicy: redirect-to-https
-          AllowedMethods:
-            - GET
-            - HEAD
-            - OPTIONS
-          CachedMethods:
-            - GET
-            - HEAD
-          ForwardedValues:
-            QueryString: false
-            Cookies:
-              Forward: none
-        ViewerCertificate:
-          CloudFrontDefaultCertificate: true
-
-  # ─── S3 SPA Bucket Policy (OAC Access Only) ───
-  SpaBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref SpaBucket
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Sid: AllowCloudFrontOACRead
-            Effect: Allow
-            Principal:
-              Service: cloudfront.amazonaws.com
-            Action: 's3:GetObject'
-            Resource: !Sub 'arn:aws:s3:::${SpaBucket}/*'
-            Condition:
-              StringEquals:
-                'AWS:SourceArn': !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${SpaDistribution}'
+  # SpaOriginAccessControl:
+  #   Type: AWS::CloudFront::OriginAccessControl
+  #   Properties:
+  #     OriginAccessControlConfig:
+  #       Name: smart-attendance-spa-oac
+  #       OriginAccessControlOriginType: s3
+  #       SigningBehavior: always
+  #       SigningProtocol: sigv4
+  # 
+  # # ─── CloudFront CDN Distribution ───
+  # SpaDistribution:
+  #   Type: AWS::CloudFront::Distribution
+  #   Properties:
+  #     DistributionConfig:
+  #       Enabled: true
+  #       DefaultRootObject: index.html
+  #       Origins:
+  #         - Id: SpaS3Origin
+  #           DomainName: !GetAtt SpaBucket.RegionalDomainName
+  #           OriginAccessControlId: !GetAtt SpaOriginAccessControl.Id
+  #           S3OriginConfig:
+  #             OriginAccessIdentity: ""
+  #         - Id: ApiOrigin
+  #           DomainName: !Sub "${AttendanceApi}.execute-api.${AWS::Region}.amazonaws.com"
+  #           CustomOriginConfig:
+  #             OriginProtocolPolicy: https-only
+  #           OriginCustomHeaders:
+  #             - HeaderName: X-Origin-Verify
+  #               HeaderValue: !Ref OriginVerifySecret
+  #       DefaultCacheBehavior:
+  #         TargetOriginId: SpaS3Origin
+  #         ViewerProtocolPolicy: redirect-to-https
+  #         AllowedMethods:
+  #           - GET
+  #           - HEAD
+  #           - OPTIONS
+  #         CachedMethods:
+  #           - GET
+  #           - HEAD
+  #         ForwardedValues:
+  #           QueryString: false
+  #           Cookies:
+  #             Forward: none
+  #       CacheBehaviors:
+  #         - PathPattern: /prod/*
+  #           TargetOriginId: ApiOrigin
+  #           ViewerProtocolPolicy: redirect-to-https
+  #           AllowedMethods:
+  #             - GET
+  #             - HEAD
+  #             - OPTIONS
+  #             - PUT
+  #             - POST
+  #             - PATCH
+  #             - DELETE
+  #           CachedMethods:
+  #             - GET
+  #             - HEAD
+  #           ForwardedValues:
+  #             QueryString: true
+  #             Headers:
+  #               - Authorization
+  #               - Content-Type
+  #             Cookies:
+  #               Forward: none
+  #       ViewerCertificate:
+  #         CloudFrontDefaultCertificate: true
+  # 
+  # # ─── S3 SPA Bucket Policy (OAC Access Only) ───
+  # SpaBucketPolicy:
+  #   Type: AWS::S3::BucketPolicy
+  #   Properties:
+  #     Bucket: !Ref SpaBucket
+  #     PolicyDocument:
+  #       Version: '2012-10-17'
+  #       Statement:
+  #         - Sid: AllowCloudFrontOACRead
+  #           Effect: Allow
+  #           Principal:
+  #             Service: cloudfront.amazonaws.com
+  #           Action: 's3:GetObject'
+  #           Resource: !Sub 'arn:aws:s3:::${SpaBucket}/*'
+  #           Condition:
+  #             StringEquals:
+  #               'AWS:SourceArn': !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${SpaDistribution}'
 
   # ─── Functions ───
   CheckInFunction:
@@ -592,6 +626,7 @@ Resources:
       Environment:
         Variables:
           DYNAMODB_TABLE: !Ref SaaSAttendanceTable
+          # ORIGIN_VERIFY_SECRET: !Ref OriginVerifySecret
       Events:
         CheckInApi:
           Type: HttpApi
@@ -600,8 +635,12 @@ Resources:
             Method: post
             ApiId: !Ref AttendanceApi
       Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref SaaSAttendanceTable
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+              Resource: !GetAtt SaaSAttendanceTable.Arn
 
   UpdateProfileFunction:
     Type: AWS::Serverless::Function
@@ -612,6 +651,7 @@ Resources:
       Environment:
         Variables:
           DYNAMODB_TABLE: !Ref SaaSAttendanceTable
+          # ORIGIN_VERIFY_SECRET: !Ref OriginVerifySecret
       Events:
         UpdateApi:
           Type: HttpApi
@@ -620,8 +660,12 @@ Resources:
             Method: patch
             ApiId: !Ref AttendanceApi
       Policies:
-        - DynamoDBWritePolicy:
-            TableName: !Ref SaaSAttendanceTable
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:UpdateItem
+              Resource: !GetAtt SaaSAttendanceTable.Arn
 
   ExportReportFunction:
     Type: AWS::Serverless::Function
@@ -641,10 +685,16 @@ Resources:
             Queue: !GetAtt ReportQueue.Arn
             BatchSize: 1
       Policies:
-        - DynamoDBReadPolicy:
-            TableName: !Ref SaaSAttendanceTable
-        - S3CrudPolicy:
-            BucketName: !Ref SaaSReportBucket
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+              Resource: !GetAtt SaaSAttendanceTable.Arn
+            - Effect: Allow
+              Action:
+                - s3:PutObject
+              Resource: !Sub 'arn:aws:s3:::${SaaSReportBucket}/*'
 
   HelloWorldFunction:
     Type: AWS::Serverless::Function

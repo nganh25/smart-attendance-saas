@@ -1,5 +1,5 @@
 const { ddbDocClient, TABLE_NAME } = require("../../shared/database");
-const { PutCommand } = require("@aws-sdk/lib-dynamodb");
+const { UpdateCommand } = require("@aws-sdk/lib-dynamodb");
 
 exports.handler = async (event) => {
     try {
@@ -9,7 +9,7 @@ exports.handler = async (event) => {
                 statusCode: 200,
                 headers: {
                     "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "POST,GET,OPTIONS",
+                    "Access-Control-Allow-Methods": "PATCH,OPTIONS",
                     "Access-Control-Allow-Headers": "Content-Type,Authorization"
                 },
                 body: ""
@@ -31,7 +31,7 @@ exports.handler = async (event) => {
         }
 
         const body = JSON.parse(event.body || "{}");
-        const { wifiBssid, gpsLocation, actionType } = body; 
+        const { fullName, email, phone } = body;
 
         // 3. Tenant Isolation & Identity Enforcement via Cognito JWT Claims
         let tenantId = body.tenantId;
@@ -72,31 +72,44 @@ exports.handler = async (event) => {
             };
         }
 
-        const isValidWifi = wifiBssid === "00:1a:2b:3c:4d:5e";
-        const isValidGps = gpsLocation && gpsLocation.includes("Lat");
+        // 4. Build DynamoDB update parameters dynamically
+        const updateExpressions = [];
+        const expressionAttributeNames = {};
+        const expressionAttributeValues = {};
 
-        if (!isValidWifi && !isValidGps) {
+        if (fullName !== undefined) {
+            updateExpressions.push("#fn = :fullName");
+            expressionAttributeNames["#fn"] = "FullName";
+            expressionAttributeValues[":fullName"] = fullName;
+        }
+        if (email !== undefined) {
+            updateExpressions.push("#em = :email");
+            expressionAttributeNames["#em"] = "Email";
+            expressionAttributeValues[":email"] = email;
+        }
+        if (phone !== undefined) {
+            updateExpressions.push("#ph = :phone");
+            expressionAttributeNames["#ph"] = "Phone";
+            expressionAttributeValues[":phone"] = phone;
+        }
+
+        if (updateExpressions.length === 0) {
             return {
                 statusCode: 400,
                 headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-                body: JSON.stringify({ message: "Chấm công thất bại: Thiết bị của bạn không nằm trong vùng văn phòng!" })
+                body: JSON.stringify({ message: "Không có thông tin thay đổi nào được gửi!" })
             };
         }
-        const timestamp = new Date().toISOString();
-        const currentDate = timestamp.substring(0, 10); 
-        const currentType = actionType === "OUT" ? "CHECKOUT" : "CHECKIN";
-        const attendanceRecord = {
-            PK: `TENANT#${tenantId}`, 
-            SK: `USER#${userId}#ATTENDANCE#${currentDate}#${currentType}`,
-            UserId: userId,
-            Timestamp: timestamp,
-            Action: currentType,
-            DeviceVerified: isValidWifi ? "Wi-Fi Office" : "GPS Mobile",
-            Status: "SUCCESS"
-        };
-        await ddbDocClient.send(new PutCommand({
+
+        await ddbDocClient.send(new UpdateCommand({
             TableName: TABLE_NAME,
-            Item: attendanceRecord
+            Key: {
+                PK: `TENANT#${tenantId}`,
+                SK: `USER#${userId}#METADATA`
+            },
+            UpdateExpression: "SET " + updateExpressions.join(", "),
+            ExpressionAttributeNames: expressionAttributeNames,
+            ExpressionAttributeValues: expressionAttributeValues
         }));
 
         return {
@@ -105,17 +118,14 @@ exports.handler = async (event) => {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*"
             },
-            body: JSON.stringify({ 
-                message: `${currentType === "CHECKIN" ? "Check-in Vào Ca" : "Check-out Ra Ca"} thành công!`, 
-                data: attendanceRecord 
-            })
+            body: JSON.stringify({ message: "Cập nhật hồ sơ thành công!" })
         };
     } catch (error) {
-        console.error("Lỗi Lambda:", error);
-        return { 
-            statusCode: 500, 
+        console.error("Lỗi cập nhật hồ sơ:", error);
+        return {
+            statusCode: 500,
             headers: { "Access-Control-Allow-Origin": "*" },
-            body: JSON.stringify({ error: error.message }) 
+            body: JSON.stringify({ error: error.message })
         };
     }
 };
