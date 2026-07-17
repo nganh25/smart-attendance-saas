@@ -17,7 +17,20 @@ const JWT_SECRET = process.env.JWT_SECRET || "SaaS_SUPER_SECRET_KEY_2026";
 
 const server = http.createServer(app);
 const corsOptions = {
-    origin: "http://127.0.0.1:5500", 
+    origin: (origin, callback) => {
+        const allowedOrigins = [
+            'http://127.0.0.1:5500',
+            'http://localhost:5173',
+            'http://127.0.0.1:5173'
+        ];
+
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Origin không được phép'));
+        }
+    },
+    credentials: true,
     optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
