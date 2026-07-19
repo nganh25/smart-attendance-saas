@@ -1,4 +1,4 @@
-<mxGraphModel dx="1651" dy="2455" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+<mxGraphModel dx="2683" dy="3303" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
   <root>
     <mxCell id="0" />
     <mxCell id="1" parent="0" />
@@ -17,7 +17,7 @@
     <mxCell id="IZY_Q4YNWJR29QdOZAtN-938" edge="1" parent="IZY_Q4YNWJR29QdOZAtN-891" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="IZY_Q4YNWJR29QdOZAtN-918">
       <mxGeometry relative="1" as="geometry" />
     </mxCell>
-    <mxCell id="IZY_Q4YNWJR29QdOZAtN-892" parent="IZY_Q4YNWJR29QdOZAtN-891" style="fillColor=none;strokeColor=#147EBA;dashed=1;verticalAlign=top;fontStyle=1;fontColor=#147EBA;whiteSpace=wrap;html=1;fontSize=12;rounded=0;pointerEvents=0;" value="Authentication &amp;amp; API Layer" vertex="1">
+    <mxCell id="IZY_Q4YNWJR29QdOZAtN-892" parent="IZY_Q4YNWJR29QdOZAtN-891" style="fillColor=none;strokeColor=#147EBA;dashed=1;verticalAlign=top;fontStyle=1;fontColor=#147EBA;whiteSpace=wrap;html=1;fontSize=12;rounded=0;pointerEvents=0;" value="Authentication &amp;amp; API Layer (VPC Private Subnet · CloudFront Ingress Only)" vertex="1">
       <mxGeometry height="280" width="1160" x="40" y="40" as="geometry" />
     </mxCell>
     <mxCell id="IZY_Q4YNWJR29QdOZAtN-893" parent="IZY_Q4YNWJR29QdOZAtN-891" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.api_gateway;" value="&lt;b&gt;Amazon API Gateway&lt;/b&gt;&lt;br&gt;HTTP API v2 · JWT Authorizer&lt;br&gt;Cache · Throttle" vertex="1">
@@ -29,7 +29,7 @@
     <mxCell id="IZY_Q4YNWJR29QdOZAtN-895" parent="IZY_Q4YNWJR29QdOZAtN-891" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#DD344C;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cognito;" value="&lt;b&gt;Amazon Cognito&lt;/b&gt;&lt;br&gt;User Auth · JWT Token&lt;br&gt;{tenantId, role, userId}" vertex="1">
       <mxGeometry height="60" width="60" x="80" y="79" as="geometry" />
     </mxCell>
-    <mxCell id="IZY_Q4YNWJR29QdOZAtN-896" parent="IZY_Q4YNWJR29QdOZAtN-891" style="fillColor=none;strokeColor=#5A6C86;dashed=1;verticalAlign=top;fontStyle=1;fontColor=#5A6C86;whiteSpace=wrap;html=1;fontSize=12;rounded=0;pointerEvents=0;" value="Compute Layer" vertex="1">
+    <mxCell id="IZY_Q4YNWJR29QdOZAtN-896" parent="IZY_Q4YNWJR29QdOZAtN-891" style="fillColor=none;strokeColor=#5A6C86;dashed=1;verticalAlign=top;fontStyle=1;fontColor=#5A6C86;whiteSpace=wrap;html=1;fontSize=12;rounded=0;pointerEvents=0;" value="Compute Layer (VPC Private Subnet · NAT Gateway Egress)" vertex="1">
       <mxGeometry height="321" width="1160" x="40" y="359" as="geometry" />
     </mxCell>
     <mxCell id="IZY_Q4YNWJR29QdOZAtN-897" parent="IZY_Q4YNWJR29QdOZAtN-891" style="fillColor=none;strokeColor=#ED7100;dashed=1;verticalAlign=top;fontStyle=1;whiteSpace=wrap;html=1;fontSize=12;rounded=0;container=1;collapsible=0;recursiveResize=0;" value="&lt;font color=&quot;#ED7100&quot;&gt;Lambda Functions&lt;/font&gt;" vertex="1">
@@ -56,19 +56,16 @@
     <mxCell id="IZY_Q4YNWJR29QdOZAtN-899" parent="IZY_Q4YNWJR29QdOZAtN-897" style="sketch=0;outlineConnect=0;fontColor=#232F3E;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" value="Lambda&lt;br&gt;Subscription" vertex="1">
       <mxGeometry height="60" width="60" x="40" y="149.5" as="geometry" />
     </mxCell>
-    <mxCell id="IZY_Q4YNWJR29QdOZAtN-902" parent="IZY_Q4YNWJR29QdOZAtN-891" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;container=1;pointerEvents=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_aws_step_functions_workflow;strokeColor=#CD2264;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#CD2264;dashed=0;" value="AWS Step Functions Workflow" vertex="1">
+    <mxCell id="IZY_Q4YNWJR29QdOZAtN-902" parent="IZY_Q4YNWJR29QdOZAtN-891" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;container=1;pointerEvents=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_aws_step_functions_workflow;strokeColor=#CD2264;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#CD2264;dashed=0;" value="AWS Step Functions Engine" vertex="1">
       <mxGeometry height="260" width="150" x="910" y="389.5" as="geometry" />
     </mxCell>
-    <mxCell id="IZY_Q4YNWJR29QdOZAtN-947" parent="IZY_Q4YNWJR29QdOZAtN-902" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sqs;" value="&lt;b&gt;Amazon SQS&lt;/b&gt;&lt;br&gt;Queue + DLQ" vertex="1">
-      <mxGeometry height="60" width="60" x="45" y="49.5" as="geometry" />
+    <mxCell id="IZY_Q4YNWJR29QdOZAtN-947" parent="IZY_Q4YNWJR29QdOZAtN-891" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sqs;" value="&lt;b&gt;Amazon SQS&lt;/b&gt;&lt;br&gt;Queue + DLQ" vertex="1">
+      <mxGeometry height="60" width="60" x="955" y="439.5" as="geometry" />
     </mxCell>
-    <mxCell id="IZY_Q4YNWJR29QdOZAtN-945" parent="IZY_Q4YNWJR29QdOZAtN-902" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.step_functions;" value="&lt;b&gt;Step Functions&lt;/b&gt;&lt;br&gt;Express · Report Workflow" vertex="1">
-      <mxGeometry height="60" width="60" x="45" y="161" as="geometry" />
-    </mxCell>
-    <mxCell id="IZY_Q4YNWJR29QdOZAtN-946" edge="1" parent="IZY_Q4YNWJR29QdOZAtN-902" source="IZY_Q4YNWJR29QdOZAtN-947" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="IZY_Q4YNWJR29QdOZAtN-945">
+    <mxCell id="IZY_Q4YNWJR29QdOZAtN-946" edge="1" parent="IZY_Q4YNWJR29QdOZAtN-891" source="IZY_Q4YNWJR29QdOZAtN-947" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" target="IZY_Q4YNWJR29QdOZAtN-945">
       <mxGeometry relative="1" as="geometry" />
     </mxCell>
-    <mxCell id="IZY_Q4YNWJR29QdOZAtN-903" parent="IZY_Q4YNWJR29QdOZAtN-891" style="fillColor=none;strokeColor=#C925D1;dashed=1;verticalAlign=top;fontStyle=1;fontColor=#C925D1;whiteSpace=wrap;html=1;fontSize=12;rounded=0;pointerEvents=0;" value="Data Layer — Single-Table Design · Partition Key Isolation" vertex="1">
+    <mxCell id="IZY_Q4YNWJR29QdOZAtN-903" parent="IZY_Q4YNWJR29QdOZAtN-891" style="fillColor=none;strokeColor=#C925D1;dashed=1;verticalAlign=top;fontStyle=1;fontColor=#C925D1;whiteSpace=wrap;html=1;fontSize=12;rounded=0;pointerEvents=0;" value="Data Layer — Single-Table Design · Partition Key Isolation (VPC Private Subnet)" vertex="1">
       <mxGeometry height="181" width="1160" x="40" y="719" as="geometry" />
     </mxCell>
     <mxCell id="IZY_Q4YNWJR29QdOZAtN-905" parent="IZY_Q4YNWJR29QdOZAtN-891" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#C925D1;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.dynamodb;" value="&lt;b&gt;Amazon DynamoDB&lt;/b&gt;&lt;br&gt;Single-Table Design · Streams Enabled&lt;br&gt;Attendance · Users · Tenants" vertex="1">
@@ -80,7 +77,7 @@
     <mxCell id="IZY_Q4YNWJR29QdOZAtN-906" parent="IZY_Q4YNWJR29QdOZAtN-891" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#7AA116;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" value="&lt;b&gt;Amazon S3&lt;/b&gt;&lt;br&gt;Report Storage&lt;br&gt;Intelligent-Tiering&lt;br&gt;PDF · Excel · CSV" vertex="1">
       <mxGeometry height="60" width="60" x="880" y="759" as="geometry" />
     </mxCell>
-    <mxCell id="IZY_Q4YNWJR29QdOZAtN-907" parent="IZY_Q4YNWJR29QdOZAtN-891" style="fillColor=none;strokeColor=#E7157B;dashed=1;verticalAlign=top;fontStyle=1;fontColor=#E7157B;whiteSpace=wrap;html=1;fontSize=12;rounded=0;pointerEvents=0;" value="Event-Driven &amp;amp; Notification Layer (Optimized)" vertex="1">
+    <mxCell id="IZY_Q4YNWJR29QdOZAtN-907" parent="IZY_Q4YNWJR29QdOZAtN-891" style="fillColor=none;strokeColor=#E7157B;dashed=1;verticalAlign=top;fontStyle=1;fontColor=#E7157B;whiteSpace=wrap;html=1;fontSize=12;rounded=0;pointerEvents=0;" value="Event-Driven &amp;amp; Notification Layer (Optimized · VPC Private Subnet)" vertex="1">
       <mxGeometry height="200" width="1160" x="40" y="939" as="geometry" />
     </mxCell>
     <mxCell id="IZY_Q4YNWJR29QdOZAtN-908" parent="IZY_Q4YNWJR29QdOZAtN-891" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.eventbridge;" value="&lt;b&gt;EventBridge&lt;/b&gt;&lt;br&gt;Event Bus&lt;br&gt;AttendanceCreated&lt;br&gt;ReportGenerated" vertex="1">
@@ -165,7 +162,6 @@
           <mxPoint x="1080" y="789" />
         </Array>
         <mxPoint x="1020" y="581" as="sourcePoint" />
-        <mxPoint x="739.9999999999998" y="759" as="targetPoint" />
       </mxGeometry>
     </mxCell>
     <mxCell id="IZY_Q4YNWJR29QdOZAtN-929" connectable="0" parent="IZY_Q4YNWJR29QdOZAtN-928" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;fontSize=12;" value="11" vertex="1">
@@ -232,8 +228,6 @@
           <mxPoint x="60" y="441" />
           <mxPoint x="60" y="229" />
         </Array>
-        <mxPoint x="-119.99999999999977" y="429" as="sourcePoint" />
-        <mxPoint x="-130" y="229" as="targetPoint" />
       </mxGeometry>
     </mxCell>
     <mxCell id="W3Ou1_WNEmM0-4xHlAby-7" edge="1" parent="IZY_Q4YNWJR29QdOZAtN-891" source="IZY_Q4YNWJR29QdOZAtN-899" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=light-dark(#000000, #ff7f93);curved=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" target="IZY_Q4YNWJR29QdOZAtN-894">
@@ -243,11 +237,9 @@
           <mxPoint x="200" y="231" />
           <mxPoint x="140" y="231" />
         </Array>
-        <mxPoint x="230" y="431" as="sourcePoint" />
-        <mxPoint x="160" y="231" as="targetPoint" />
       </mxGeometry>
     </mxCell>
-    <mxCell id="STEP_FUNCTIONS_TO_DYNAMODB" edge="1" parent="IZY_Q4YNWJR29QdOZAtN-891" source="IZY_Q4YNWJR29QdOZAtN-945" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;dashed=1;entryX=1;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" target="IZY_Q4YNWJR29QdOZAtN-905">
+    <mxCell id="STEP_FUNCTIONS_TO_DYNAMODB" edge="1" parent="IZY_Q4YNWJR29QdOZAtN-891" source="IZY_Q4YNWJR29QdOZAtN-945" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;dashed=0;entryX=1;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" target="IZY_Q4YNWJR29QdOZAtN-905">
       <mxGeometry relative="1" as="geometry">
         <Array as="points">
           <mxPoint x="600" y="610" />
@@ -261,23 +253,16 @@
       </mxGeometry>
     </mxCell>
     <mxCell id="KMS_TO_DYNAMODB" edge="1" parent="IZY_Q4YNWJR29QdOZAtN-891" source="eGw0r24oLBRvdceVqXjp-1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#000000;endArrow=classic;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" target="IZY_Q4YNWJR29QdOZAtN-905">
-      <mxGeometry relative="1" as="geometry">
-        <Array as="points" />
-        <mxPoint x="710" y="789" as="sourcePoint" />
-        <mxPoint x="510" y="790" as="targetPoint" />
-      </mxGeometry>
+      <mxGeometry relative="1" as="geometry" />
     </mxCell>
     <mxCell id="fnu_oz0hjjLdBXa4mvr0-1" edge="1" parent="IZY_Q4YNWJR29QdOZAtN-891" source="eGw0r24oLBRvdceVqXjp-1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#000000;endArrow=classic;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" target="IZY_Q4YNWJR29QdOZAtN-906">
-      <mxGeometry relative="1" as="geometry">
-        <Array as="points" />
-        <mxPoint x="995" y="820" as="sourcePoint" />
-        <mxPoint x="850" y="820" as="targetPoint" />
-      </mxGeometry>
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="IZY_Q4YNWJR29QdOZAtN-945" parent="IZY_Q4YNWJR29QdOZAtN-891" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=10;fontStyle=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.step_functions;" value="&lt;b&gt;Step Functions&lt;/b&gt;&lt;br&gt;Standard · Report Workflow" vertex="1">
+      <mxGeometry height="60" width="60" x="955" y="550" as="geometry" />
     </mxCell>
     <mxCell id="IZY_Q4YNWJR29QdOZAtN-950" edge="1" parent="IZY_Q4YNWJR29QdOZAtN-623" source="IZY_Q4YNWJR29QdOZAtN-958" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#000000;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" target="IZY_Q4YNWJR29QdOZAtN-893">
-      <mxGeometry relative="1" as="geometry">
-        <Array as="points" />
-      </mxGeometry>
+      <mxGeometry relative="1" as="geometry" />
     </mxCell>
     <mxCell id="IZY_Q4YNWJR29QdOZAtN-951" connectable="0" parent="IZY_Q4YNWJR29QdOZAtN-950" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;fontSize=12;" value="4a (Header Verify)" vertex="1">
       <mxGeometry relative="1" as="geometry">
@@ -306,9 +291,7 @@
       <mxGeometry height="60" width="60" x="680" y="140" as="geometry" />
     </mxCell>
     <mxCell id="IZY_Q4YNWJR29QdOZAtN-962" edge="1" parent="IZY_Q4YNWJR29QdOZAtN-952" source="IZY_Q4YNWJR29QdOZAtN-958" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" target="IZY_Q4YNWJR29QdOZAtN-961">
-      <mxGeometry relative="1" as="geometry">
-        <mxPoint x="730" y="138" as="sourcePoint" />
-      </mxGeometry>
+      <mxGeometry relative="1" as="geometry" />
     </mxCell>
     <mxCell id="IZY_Q4YNWJR29QdOZAtN-963" connectable="0" parent="IZY_Q4YNWJR29QdOZAtN-962" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;fontSize=12;" value="3" vertex="1">
       <mxGeometry relative="1" as="geometry">
@@ -316,10 +299,7 @@
       </mxGeometry>
     </mxCell>
     <mxCell id="W3Ou1_WNEmM0-4xHlAby-1" edge="1" parent="IZY_Q4YNWJR29QdOZAtN-952" source="IZY_Q4YNWJR29QdOZAtN-957" style="edgeStyle=none;rounded=1;dashed=1;endArrow=none;strokeColor=#000000;" target="IZY_Q4YNWJR29QdOZAtN-958">
-      <mxGeometry relative="1" as="geometry">
-        <mxPoint x="440" y="210" as="sourcePoint" />
-        <mxPoint x="580" y="140" as="targetPoint" />
-      </mxGeometry>
+      <mxGeometry relative="1" as="geometry" />
     </mxCell>
     <mxCell id="MOBILE_API_EDGE" edge="1" parent="IZY_Q4YNWJR29QdOZAtN-952" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4D4D4D;entryX=0.057;entryY=0.822;entryDx=0;entryDy=0;entryPerimeter=0;" target="IZY_Q4YNWJR29QdOZAtN-958">
       <mxGeometry relative="1" as="geometry">
@@ -328,8 +308,6 @@
           <mxPoint x="360" y="310" />
           <mxPoint x="360" y="189" />
         </Array>
-        <mxPoint x="-220" y="450" as="sourcePoint" />
-        <mxPoint x="430" y="190" as="targetPoint" />
       </mxGeometry>
     </mxCell>
     <mxCell id="MOBILE_API_EDGE_LABEL" connectable="0" parent="MOBILE_API_EDGE" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;fontSize=12;" value="5" vertex="1">
@@ -337,8 +315,8 @@
         <mxPoint as="offset" />
       </mxGeometry>
     </mxCell>
-    <mxCell id="IZY_Q4YNWJR29QdOZAtN-964" parent="IZY_Q4YNWJR29QdOZAtN-623" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=10;fontColor=#232F3E;fillColor=#F5F5F5;strokeColor=#CCCCCC;rounded=1;arcSize=8;spacing=8;" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;&lt;b&gt;Process Flow Legend&lt;/b&gt;&lt;br&gt;&lt;div&gt;&lt;b&gt;1&lt;/b&gt; DNS Request ↔ Route 53&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;2&lt;/b&gt; HTTPS Request → CloudFront (Protected by WAF + Shield)&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;3&lt;/b&gt; Static Content Delivery ← Amazon S3 (React SPA)&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;4&lt;/b&gt; Authentication (Web/Mobile) ↔ Amazon Cognito&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;4a&lt;/b&gt; API Proxy Path (Custom Header Verify) → CloudFront → API Gateway&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;5&lt;/b&gt; Authorized Request (with JWT) → CloudFront&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;6&lt;/b&gt; Synchronous API Triggers → Lambda Functions&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;7&lt;/b&gt; Asynchronous Report Request → SQS Queue (Step Functions Box)&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;8a&lt;/b&gt; CDC Capture → DynamoDB Streams&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;8b&lt;/b&gt; CDC Events → DynamoDB Streams → EventBridge&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;9&lt;/b&gt; Workflow Complete Events → Step Functions → EventBridge&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;10&lt;/b&gt; Transactional Data Ops ↔ DynamoDB (Single-Table Design)&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;11&lt;/b&gt; Report File Storage → Amazon S3 (Intelligent-Tiering)&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;12&lt;/b&gt; Notification Routing → SQS Email Queue + DLQ&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;13&lt;/b&gt; Batch Processing → Lambda Email Worker&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;14&lt;/b&gt; Secured Email Delivery → Amazon SES&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;15&lt;/b&gt; Outbound Webhook Alerts → External Systems&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;16&lt;/b&gt; B2B Subscription Billing → Payment Gateway&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;16b&lt;/b&gt; Inbound Payment Webhook → API Gateway → Lambda Webhook&lt;/div&gt;&lt;/font&gt;" vertex="1">
-      <mxGeometry height="680" width="290" x="1320" y="40" as="geometry" />
+    <mxCell id="IZY_Q4YNWJR29QdOZAtN-964" parent="IZY_Q4YNWJR29QdOZAtN-623" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=10;fontColor=#232F3E;fillColor=#F5F5F5;strokeColor=#CCCCCC;rounded=1;arcSize=8;spacing=8;" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;&lt;b&gt;Process Flow Legend&lt;/b&gt;&lt;br&gt;&lt;div&gt;&lt;b&gt;1&lt;/b&gt; DNS Request ↔ Route 53&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;2&lt;/b&gt; HTTPS Request → CloudFront (Protected by WAF + Shield)&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;3&lt;/b&gt; Static Content Delivery ← Amazon S3 (React SPA)&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;4&lt;/b&gt; Authentication (Web/Mobile) ↔ Amazon Cognito&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;4a&lt;/b&gt; API Proxy Path (Custom Header Verify) → CloudFront → API Gateway&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;5&lt;/b&gt; Authorized Request (with JWT) → CloudFront&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;6&lt;/b&gt; Synchronous API Triggers → Lambda Functions&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;7&lt;/b&gt; Asynchronous Report Request → SQS Queue (Independent Layer)&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;8a&lt;/b&gt; CDC Capture → DynamoDB Streams&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;8b&lt;/b&gt; CDC Events → DynamoDB Streams → EventBridge&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;9&lt;/b&gt; Workflow Complete Events → Step Functions → EventBridge&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;10&lt;/b&gt; Transactional Data Ops ↔ DynamoDB (Single-Table Design)&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;11&lt;/b&gt; Report File Storage → Amazon S3 (Intelligent-Tiering)&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;12&lt;/b&gt; Notification Routing → SQS Email Queue + DLQ&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;13&lt;/b&gt; Batch Processing → Lambda Email Worker&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;14&lt;/b&gt; Secured Email Delivery → Amazon SES&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;15&lt;/b&gt; Outbound Webhook Alerts → External Systems&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;16&lt;/b&gt; B2B Subscription Billing → Payment Gateway&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;16a&lt;/b&gt; Inbound Payment Webhook → API Gateway → Lambda Webhook&lt;/div&gt;&lt;/font&gt;" vertex="1">
+      <mxGeometry height="720" width="290" x="1320" y="40" as="geometry" />
     </mxCell>
     <mxCell id="IZY_Q4YNWJR29QdOZAtN-969" edge="1" parent="1" source="IZY_Q4YNWJR29QdOZAtN-949" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=light-dark(#000000, #d86d0c);" target="IZY_Q4YNWJR29QdOZAtN-968">
       <mxGeometry relative="1" as="geometry" />
@@ -428,7 +406,6 @@
           <mxPoint x="600" y="360" />
           <mxPoint x="600" y="250" />
         </Array>
-        <mxPoint x="660" y="280" as="targetPoint" />
       </mxGeometry>
     </mxCell>
     <mxCell id="NEW_EDGE_6_LABEL" connectable="0" parent="NEW_EDGE_6" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;fontSize=12;" value="5" vertex="1">
@@ -439,7 +416,6 @@
     <mxCell id="IZY_Q4YNWJR29QdOZAtN-965" edge="1" parent="1" source="IZY_Q4YNWJR29QdOZAtN-967" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;startArrow=classic;endArrow=classic;" target="IZY_Q4YNWJR29QdOZAtN-895" value="">
       <mxGeometry relative="1" width="100" as="geometry">
         <mxPoint x="100" y="549" as="sourcePoint" />
-        <mxPoint x="390" y="660" as="targetPoint" />
       </mxGeometry>
     </mxCell>
     <mxCell id="IZY_Q4YNWJR29QdOZAtN-966" connectable="0" parent="IZY_Q4YNWJR29QdOZAtN-965" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;fontSize=12;" value="4" vertex="1">
@@ -457,7 +433,7 @@
         </Array>
       </mxGeometry>
     </mxCell>
-    <mxCell id="PAYMENT_WEBHOOK_INBOUND_LABEL" connectable="0" parent="PAYMENT_WEBHOOK_INBOUND" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;fontSize=11;" value="16b (Inbound Webhook → API GW)" vertex="1">
+    <mxCell id="PAYMENT_WEBHOOK_INBOUND_LABEL" connectable="0" parent="PAYMENT_WEBHOOK_INBOUND" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;fontSize=11;" value="16a (Inbound Webhook → API GW)" vertex="1">
       <mxGeometry relative="1" as="geometry">
         <mxPoint y="-10" as="offset" />
       </mxGeometry>

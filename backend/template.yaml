@@ -19,6 +19,8 @@ Resources:
     Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: smart-attendance-user-pool
+      AutoVerifiedAttributes:
+        - email
       Policies:
         PasswordPolicy:
           MinimumLength: 12
@@ -62,6 +64,7 @@ Resources:
       ExplicitAuthFlows:
         - ALLOW_USER_SRP_AUTH
         - ALLOW_REFRESH_TOKEN_AUTH
+        - ALLOW_USER_PASSWORD_AUTH
       PreventUserExistenceErrors: ENABLED
 
   # ─── HTTP API Gateway with JWT Authorizer ───
@@ -73,8 +76,6 @@ Resources:
         DefaultAuthorizer: CognitoAuthorizer
         Authorizers:
           CognitoAuthorizer:
-            AuthorizationScopes:
-              - openid
             IdentitySource: $request.header.Authorization
             JwtConfiguration:
               issuer: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}'
@@ -82,7 +83,7 @@ Resources:
                 - !Ref CognitoUserPoolClient
       CorsConfiguration:
         AllowOrigins:
-          - !Ref AllowedOrigin
+          - "*"
         AllowMethods:
           - GET
           - POST
@@ -517,106 +518,89 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub 'smart-attendance-spa-hosting-${AWS::AccountId}'
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
       PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        IgnorePublicAcls: true
-        BlockPublicPolicy: true
-        RestrictPublicBuckets: true
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: 'aws:kms'
-              KMSMasterKeyID: !Ref DataKMSKey
-            BucketKeyEnabled: true
+        BlockPublicAcls: false
+        IgnorePublicAcls: false
+        BlockPublicPolicy: false
+        RestrictPublicBuckets: false
 
-  # ─── CloudFront Origin Access Control (OAC) ───
-  # SpaOriginAccessControl:
-  #   Type: AWS::CloudFront::OriginAccessControl
-  #   Properties:
-  #     OriginAccessControlConfig:
-  #       Name: smart-attendance-spa-oac
-  #       OriginAccessControlOriginType: s3
-  #       SigningBehavior: always
-  #       SigningProtocol: sigv4
-  # 
-  # # ─── CloudFront CDN Distribution ───
-  # SpaDistribution:
-  #   Type: AWS::CloudFront::Distribution
-  #   Properties:
-  #     DistributionConfig:
-  #       Enabled: true
-  #       DefaultRootObject: index.html
-  #       Origins:
-  #         - Id: SpaS3Origin
-  #           DomainName: !GetAtt SpaBucket.RegionalDomainName
-  #           OriginAccessControlId: !GetAtt SpaOriginAccessControl.Id
-  #           S3OriginConfig:
-  #             OriginAccessIdentity: ""
-  #         - Id: ApiOrigin
-  #           DomainName: !Sub "${AttendanceApi}.execute-api.${AWS::Region}.amazonaws.com"
-  #           CustomOriginConfig:
-  #             OriginProtocolPolicy: https-only
-  #           OriginCustomHeaders:
-  #             - HeaderName: X-Origin-Verify
-  #               HeaderValue: !Ref OriginVerifySecret
-  #       DefaultCacheBehavior:
-  #         TargetOriginId: SpaS3Origin
-  #         ViewerProtocolPolicy: redirect-to-https
-  #         AllowedMethods:
-  #           - GET
-  #           - HEAD
-  #           - OPTIONS
-  #         CachedMethods:
-  #           - GET
-  #           - HEAD
-  #         ForwardedValues:
-  #           QueryString: false
-  #           Cookies:
-  #             Forward: none
-  #       CacheBehaviors:
-  #         - PathPattern: /prod/*
-  #           TargetOriginId: ApiOrigin
-  #           ViewerProtocolPolicy: redirect-to-https
-  #           AllowedMethods:
-  #             - GET
-  #             - HEAD
-  #             - OPTIONS
-  #             - PUT
-  #             - POST
-  #             - PATCH
-  #             - DELETE
-  #           CachedMethods:
-  #             - GET
-  #             - HEAD
-  #           ForwardedValues:
-  #             QueryString: true
-  #             Headers:
-  #               - Authorization
-  #               - Content-Type
-  #             Cookies:
-  #               Forward: none
-  #       ViewerCertificate:
-  #         CloudFrontDefaultCertificate: true
-  # 
-  # # ─── S3 SPA Bucket Policy (OAC Access Only) ───
-  # SpaBucketPolicy:
-  #   Type: AWS::S3::BucketPolicy
-  #   Properties:
-  #     Bucket: !Ref SpaBucket
-  #     PolicyDocument:
-  #       Version: '2012-10-17'
-  #       Statement:
-  #         - Sid: AllowCloudFrontOACRead
-  #           Effect: Allow
-  #           Principal:
-  #             Service: cloudfront.amazonaws.com
-  #           Action: 's3:GetObject'
-  #           Resource: !Sub 'arn:aws:s3:::${SpaBucket}/*'
-  #           Condition:
-  #             StringEquals:
-  #               'AWS:SourceArn': !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${SpaDistribution}'
+  # ─── S3 SPA Bucket Policy ───
+  SpaBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SpaBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: PublicReadGetObject
+            Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Sub 'arn:aws:s3:::${SpaBucket}/*'
 
   # ─── Functions ───
+  AuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handler/auth/auth.handler
+      Runtime: nodejs20.x
+      Timeout: 15
+      Tracing: Active
+      Environment:
+        Variables:
+          COGNITO_CLIENT_ID: !Ref CognitoUserPoolClient
+          COGNITO_USER_POOL_ID: !Ref CognitoUserPool
+          DYNAMODB_TABLE: !Ref SaaSAttendanceTable
+      Events:
+        LoginApi:
+          Type: HttpApi
+          Properties:
+            Path: /auth/login
+            Method: post
+            ApiId: !Ref AttendanceApi
+            Auth:
+              Authorizer: NONE
+        RegisterRequestApi:
+          Type: HttpApi
+          Properties:
+            Path: /auth/register/request
+            Method: post
+            ApiId: !Ref AttendanceApi
+            Auth:
+              Authorizer: NONE
+        RegisterVerifyApi:
+          Type: HttpApi
+          Properties:
+            Path: /auth/register/verify
+            Method: post
+            ApiId: !Ref AttendanceApi
+            Auth:
+              Authorizer: NONE
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - cognito-idp:SignUp
+                - cognito-idp:ConfirmSignUp
+                - cognito-idp:InitiateAuth
+              Resource: !GetAtt CognitoUserPool.Arn
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+                - dynamodb:GetItem
+              Resource: !GetAtt SaaSAttendanceTable.Arn
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - kms:Encrypt
+                - kms:GenerateDataKey
+              Resource: !GetAtt DataKMSKey.Arn
+
   CheckInFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -641,6 +625,12 @@ Resources:
               Action:
                 - dynamodb:PutItem
               Resource: !GetAtt SaaSAttendanceTable.Arn
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - kms:Encrypt
+                - kms:GenerateDataKey
+              Resource: !GetAtt DataKMSKey.Arn
 
   UpdateProfileFunction:
     Type: AWS::Serverless::Function
@@ -666,6 +656,12 @@ Resources:
               Action:
                 - dynamodb:UpdateItem
               Resource: !GetAtt SaaSAttendanceTable.Arn
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - kms:Encrypt
+                - kms:GenerateDataKey
+              Resource: !GetAtt DataKMSKey.Arn
 
   ExportReportFunction:
     Type: AWS::Serverless::Function
@@ -695,6 +691,12 @@ Resources:
               Action:
                 - s3:PutObject
               Resource: !Sub 'arn:aws:s3:::${SaaSReportBucket}/*'
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - kms:Encrypt
+                - kms:GenerateDataKey
+              Resource: !GetAtt DataKMSKey.Arn
 
   HelloWorldFunction:
     Type: AWS::Serverless::Function
@@ -723,6 +725,279 @@ Resources:
             ApiId: !Ref AttendanceApi
             Path: /hello
             Method: get
+
+  # ─── Check-Out Lambda (Clock-Out Record) ───
+  CheckOutFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handler/attendance/checkout.handler
+      Runtime: nodejs20.x
+      Timeout: 10
+      Tracing: Active
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref SaaSAttendanceTable
+      Events:
+        CheckOutApi:
+          Type: HttpApi
+          Properties:
+            Path: /attendance/check-out
+            Method: post
+            ApiId: !Ref AttendanceApi
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+              Resource: !GetAtt SaaSAttendanceTable.Arn
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - kms:Encrypt
+                - kms:GenerateDataKey
+              Resource: !GetAtt DataKMSKey.Arn
+
+  # ─── Attendance History Lambda (Query & Summary) ───
+  AttendanceHistoryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handler/attendance/history.handler
+      Runtime: nodejs20.x
+      Timeout: 10
+      Tracing: Active
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref SaaSAttendanceTable
+      Events:
+        HistoryApi:
+          Type: HttpApi
+          Properties:
+            Path: /attendance/history
+            Method: get
+            ApiId: !Ref AttendanceApi
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+              Resource: !GetAtt SaaSAttendanceTable.Arn
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - kms:Encrypt
+                - kms:GenerateDataKey
+              Resource: !GetAtt DataKMSKey.Arn
+
+  AdminFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handler/admin/admin.handler
+      Runtime: nodejs20.x
+      Timeout: 10
+      Tracing: Active
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref SaaSAttendanceTable
+          COGNITO_USER_POOL_ID: !Ref CognitoUserPool
+      Events:
+        AdminListApi:
+          Type: HttpApi
+          Properties:
+            Path: /admin/users
+            Method: get
+            ApiId: !Ref AttendanceApi
+        AdminUpdateApi:
+          Type: HttpApi
+          Properties:
+            Path: /admin/users
+            Method: patch
+            ApiId: !Ref AttendanceApi
+        AdminCreateUserApi:
+          Type: HttpApi
+          Properties:
+            Path: /admin/users/create
+            Method: post
+            ApiId: !Ref AttendanceApi
+        AdminUpdateUserProfileApi:
+          Type: HttpApi
+          Properties:
+            Path: /admin/users/profile
+            Method: patch
+            ApiId: !Ref AttendanceApi
+        AdminDeleteUserApi:
+          Type: HttpApi
+          Properties:
+            Path: /admin/users/delete
+            Method: delete
+            ApiId: !Ref AttendanceApi
+        AdminAttendanceSummaryApi:
+          Type: HttpApi
+          Properties:
+            Path: /admin/attendance/summary
+            Method: get
+            ApiId: !Ref AttendanceApi
+        AdminAttendanceApiPost:
+          Type: HttpApi
+          Properties:
+            Path: /admin/attendance
+            Method: post
+            ApiId: !Ref AttendanceApi
+        AdminAttendanceApiPatch:
+          Type: HttpApi
+          Properties:
+            Path: /admin/attendance
+            Method: patch
+            ApiId: !Ref AttendanceApi
+        AdminAttendanceApiDelete:
+          Type: HttpApi
+          Properties:
+            Path: /admin/attendance
+            Method: delete
+            ApiId: !Ref AttendanceApi
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+                - dynamodb:UpdateItem
+                - dynamodb:DeleteItem
+              Resource: !GetAtt SaaSAttendanceTable.Arn
+            - Effect: Allow
+              Action:
+                - cognito-idp:AdminCreateUser
+                - cognito-idp:AdminSetUserPassword
+                - cognito-idp:AdminDeleteUser
+                - cognito-idp:AdminUpdateUserAttributes
+                - cognito-idp:AdminDisableUser
+                - cognito-idp:AdminEnableUser
+              Resource: !GetAtt CognitoUserPool.Arn
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - kms:Encrypt
+                - kms:GenerateDataKey
+              Resource: !GetAtt DataKMSKey.Arn
+
+  # ─── Excel Report Export API Lambda ───
+  ExportReportApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handler/reports/exportApi.handler
+      Runtime: nodejs20.x
+      Timeout: 30
+      Tracing: Active
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref SaaSAttendanceTable
+      Events:
+        ExportReportApi:
+          Type: HttpApi
+          Properties:
+            Path: /attendance/export/{yearMonth}
+            Method: get
+            ApiId: !Ref AttendanceApi
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+                - dynamodb:GetItem
+              Resource: !GetAtt SaaSAttendanceTable.Arn
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - kms:Encrypt
+                - kms:GenerateDataKey
+              Resource: !GetAtt DataKMSKey.Arn
+
+  # ─── Subscription Lambda (B2B Billing) ───
+  SubscriptionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handler/billing/subscription.handler
+      Runtime: nodejs20.x
+      Timeout: 10
+      Tracing: Active
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref SaaSAttendanceTable
+      Events:
+        SubscriptionGetApi:
+          Type: HttpApi
+          Properties:
+            Path: /billing/subscription
+            Method: get
+            ApiId: !Ref AttendanceApi
+        SubscriptionPostApi:
+          Type: HttpApi
+          Properties:
+            Path: /billing/create-payment
+            Method: post
+            ApiId: !Ref AttendanceApi
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+                - dynamodb:GetItem
+              Resource: !GetAtt SaaSAttendanceTable.Arn
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - kms:Encrypt
+                - kms:GenerateDataKey
+              Resource: !GetAtt DataKMSKey.Arn
+
+  # ─── Webhook Lambda (Inbound Payment — No Auth) ───
+  WebhookFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handler/billing/webhook.handler
+      Runtime: nodejs20.x
+      Timeout: 10
+      Tracing: Active
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref SaaSAttendanceTable
+      Events:
+        WebhookApi:
+          Type: HttpApi
+          Properties:
+            Path: /billing/webhook
+            Method: post
+            ApiId: !Ref AttendanceApi
+            Auth:
+              Authorizer: NONE
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:UpdateItem
+              Resource: !GetAtt SaaSAttendanceTable.Arn
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource: !Ref WebhookSecret
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - kms:Encrypt
+                - kms:GenerateDataKey
+              Resource: !GetAtt DataKMSKey.Arn
 
 Outputs:
   AttendanceApiUrl:
