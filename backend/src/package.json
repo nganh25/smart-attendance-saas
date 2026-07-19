@@ -1,16 +1,14 @@
 {
+  "name": "smart-attendance-lambda-handlers",
+  "version": "1.0.0",
+  "description": "Dependencies for time-attendance serverless lambda functions",
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.1090.0",
     "@aws-sdk/client-dynamodb": "^3.1081.0",
     "@aws-sdk/client-s3": "^3.1081.0",
+    "@aws-sdk/client-ses": "^3.1081.0",
     "@aws-sdk/lib-dynamodb": "^3.1081.0",
     "@payos/node": "^2.0.5",
-    "bcryptjs": "^3.0.3",
-    "cors": "^2.8.6",
-    "exceljs": "^4.4.0",
-    "express": "^5.2.1",
-    "express-rate-limit": "^8.5.2",
-    "jsonwebtoken": "^9.0.3",
-    "socket.io": "^4.8.3"
+    "exceljs": "^4.4.0"
   }
 }
