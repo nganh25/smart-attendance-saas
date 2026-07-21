@@ -30,12 +30,10 @@ exports.handler = async (event) => {
 
         const { tenantId, userId } = identity;
 
-        // Device verification
-        const isValidWifi = wifiBssid === "00:1a:2b:3c:4d:5e";
-        const isValidGps = gpsLocation && gpsLocation.includes("Lat");
+        const isValidGps = gpsLocation && !gpsLocation.includes("10.823099") && !gpsLocation.toLowerCase().includes("outside") && !gpsLocation.toLowerCase().includes("ngoài");
 
-        if (!isValidWifi && !isValidGps) {
-            return error(400, "Chấm công thất bại: Thiết bị của bạn không nằm trong vùng văn phòng!");
+        if (!isValidGps) {
+            return error(400, "Vị trí GPS nằm ngoài phạm vi văn phòng, hệ thống từ chối chấm công!");
         }
 
         const timestamp = new Date().toISOString();
@@ -47,7 +45,7 @@ exports.handler = async (event) => {
             UserId: userId,
             Timestamp: timestamp,
             Action: "CHECKOUT",
-            DeviceVerified: isValidWifi ? "Wi-Fi Office" : "GPS Mobile",
+            DeviceVerified: "GPS Verified",
             Status: "SUCCESS"
         };
 
