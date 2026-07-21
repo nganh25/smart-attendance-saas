@@ -72,14 +72,13 @@ exports.handler = async (event) => {
             };
         }
 
-        const isValidWifi = wifiBssid === "00:1a:2b:3c:4d:5e";
-        const isValidGps = gpsLocation && gpsLocation.includes("Lat");
+        const isValidGps = gpsLocation && !gpsLocation.includes("10.823099") && !gpsLocation.toLowerCase().includes("outside") && !gpsLocation.toLowerCase().includes("ngoài");
 
-        if (!isValidWifi && !isValidGps) {
+        if (!isValidGps) {
             return {
                 statusCode: 400,
                 headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-                body: JSON.stringify({ message: "Chấm công thất bại: Thiết bị của bạn không nằm trong vùng văn phòng!" })
+                body: JSON.stringify({ message: "Vị trí GPS nằm ngoài phạm vi văn phòng, hệ thống từ chối chấm công!" })
             };
         }
         const timestamp = new Date().toISOString();

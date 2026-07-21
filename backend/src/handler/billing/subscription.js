@@ -49,7 +49,7 @@ exports.handler = async (event) => {
             const subscription = result.Item || {
                 plan: "FREE",
                 status: "ACTIVE",
-                maxUsers: 5,
+                maxUsers: 50,
                 expiresAt: null
             };
 

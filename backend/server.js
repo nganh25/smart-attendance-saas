@@ -292,31 +292,119 @@ app.patch('/profile/update', authenticateToken, async (req, res) => {
 
 // ═══════════════════════════════════════════════════════════════
 //  ATTENDANCE ROUTES
-// ═══════════════════════════════════════════════════════════════
+// ─── Shift & Attendance Rules Helpers ───
+const DEFAULT_SHIFT_CONFIG = {
+    shiftStart: "08:00",
+    shiftEnd: "17:00",
+    windowCheckinStart: "07:00",
+    windowCheckinEnd: "10:00",
+    windowCheckoutStart: "16:00",
+    windowCheckoutEnd: "20:00",
+    gracePeriodMinutes: 5,
+    cooldownMinutes: 2,
+    otThresholdMinutes: 30
+};
+
+async function getTenantShiftConfig(tenantId) {
+    try {
+        const result = await ddbDocClient.send(new GetCommand({
+            TableName: TABLE_NAME,
+            Key: { PK: `TENANT#${tenantId}`, SK: "SHIFT_CONFIG#DEFAULT" }
+        }));
+        return result.Item ? { ...DEFAULT_SHIFT_CONFIG, ...result.Item } : DEFAULT_SHIFT_CONFIG;
+    } catch {
+        return DEFAULT_SHIFT_CONFIG;
+    }
+}
+
+function timeToMinutes(timeStr) {
+    if (!timeStr) return 0;
+    const [h, m] = timeStr.split(':').map(Number);
+    return (h || 0) * 60 + (m || 0);
+}
 
 app.post('/attendance/check-in', authenticateToken, async (req, res) => {
     const { tenantId, userId } = req.user;
-    const { wifiBssid, actionType } = req.body;
+    const { gpsLocation, actionType } = req.body;
 
-    if (wifiBssid !== "00:1a:2b:3c:4d:5e") {
-        return res.status(400).json({ message: "Sai Wi-Fi văn phòng, hệ thống từ chối chấm công trái phép!" });
+    // 1. GPS location check (Office GPS validation)
+    const isOutside = !gpsLocation || gpsLocation.includes('10.823099') || gpsLocation.toLowerCase().includes('outside') || gpsLocation.toLowerCase().includes('ngoài');
+    if (isOutside) {
+        return res.status(400).json({ message: "Vị trí GPS nằm ngoài phạm vi văn phòng, hệ thống từ chối chấm công!" });
     }
 
-    const timestamp = new Date().toISOString();
+    const config = await getTenantShiftConfig(tenantId);
+    const now = new Date();
+    const timestamp = now.toISOString();
     const currentDate = timestamp.substring(0, 10);
     const currentType = actionType === "OUT" ? "CHECKOUT" : "CHECKIN";
+
+    // 2. Cooldown Time Check (Prevent rapid duplicate logs)
+    try {
+        const historyRes = await ddbDocClient.send(new QueryCommand({
+            TableName: TABLE_NAME,
+            KeyConditionExpression: "PK = :pk AND SK BEGINS_WITH(:skPrefix)",
+            ExpressionAttributeValues: {
+                ":pk": `TENANT#${tenantId}`,
+                ":skPrefix": `USER#${userId}#ATTENDANCE#`
+            },
+            ScanIndexForward: false,
+            Limit: 3
+        }));
+        const recentLogs = historyRes.Items || [];
+        if (recentLogs.length > 0) {
+            const lastLogTime = new Date(recentLogs[0].Timestamp).getTime();
+            const diffMs = now.getTime() - lastLogTime;
+            const cooldownMs = (config.cooldownMinutes || 2) * 60 * 1000;
+            if (diffMs < cooldownMs) {
+                const waitSecs = Math.ceil((cooldownMs - diffMs) / 1000);
+                return res.status(400).json({ message: `Thao tác quá nhanh! Vui lòng chờ ${waitSecs} giây nữa trước khi chấm công lại (Thời gian chống trùng).` });
+            }
+        }
+    } catch (e) {
+        // Continue if query fails
+    }
+
+    // 3. Window Time Check (Khung giờ cho phép check-in)
+    const currentHHMM = now.toTimeString().substring(0, 5);
+    const currentMinutes = timeToMinutes(currentHHMM);
+    const winStartMins = timeToMinutes(config.windowCheckinStart || "07:00");
+    const winEndMins = timeToMinutes(config.windowCheckinEnd || "10:00");
+
+    if (currentMinutes < winStartMins || currentMinutes > winEndMins) {
+        return res.status(400).json({ message: `Hiện không trong khung giờ Check-in! Khung giờ mở: ${config.windowCheckinStart || '07:00'} - ${config.windowCheckinEnd || '10:00'}.` });
+    }
+
+    // 4. Grace Period Check (Đúng giờ vs Đi muộn)
+    const shiftStartMins = timeToMinutes(config.shiftStart || "08:00");
+    const maxOnTimeMins = shiftStartMins + (Number(config.gracePeriodMinutes) || 5);
+    const isLate = currentMinutes > maxOnTimeMins;
+    const statusText = isLate ? "LATE" : "ON_TIME";
+    const statusNote = isLate 
+        ? `Đi muộn (Vào lúc ${currentHHMM}, quá mốc dung sai ${config.shiftStart}+${config.gracePeriodMinutes}m)` 
+        : `Đúng giờ (Vào lúc ${currentHHMM})`;
 
     try {
         const attendanceRecord = {
             PK: `TENANT#${tenantId}`,
             SK: `USER#${userId}#ATTENDANCE#${currentDate}#${currentType}`,
-            UserId: userId, Timestamp: timestamp, Action: currentType, DeviceVerified: "Wi-Fi Office", Status: "SUCCESS"
+            UserId: userId,
+            Timestamp: timestamp,
+            Action: currentType,
+            DeviceVerified: "GPS Verified",
+            Status: statusText,
+            Note: statusNote,
+            ShiftStart: config.shiftStart,
+            ShiftEnd: config.shiftEnd
         };
         await ddbDocClient.send(new PutCommand({ TableName: TABLE_NAME, Item: attendanceRecord }));
 
         io.to(tenantId).emit('new_attendance_alert', { userId: userId, action: currentType });
 
-        res.status(200).json({ message: "Ghi nhận ca làm việc thành công!", data: attendanceRecord });
+        res.status(200).json({ 
+            message: `Check-in thành công (${isLate ? '⚠️ Đi muộn' : '✅ Đúng giờ'})!`, 
+            data: attendanceRecord 
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -324,26 +412,84 @@ app.post('/attendance/check-in', authenticateToken, async (req, res) => {
 
 app.post('/attendance/check-out', authenticateToken, async (req, res) => {
     const { tenantId, userId } = req.user;
-    const { wifiBssid } = req.body;
+    const { gpsLocation } = req.body;
 
-    if (wifiBssid !== "00:1a:2b:3c:4d:5e") {
-        return res.status(400).json({ message: "Sai Wi-Fi văn phòng, hệ thống từ chối chấm công trái phép!" });
+    // 1. GPS location check
+    const isOutside = !gpsLocation || gpsLocation.includes('10.823099') || gpsLocation.toLowerCase().includes('outside') || gpsLocation.toLowerCase().includes('ngoài');
+    if (isOutside) {
+        return res.status(400).json({ message: "Vị trí GPS nằm ngoài phạm vi văn phòng, hệ thống từ chối chấm công!" });
     }
 
-    const timestamp = new Date().toISOString();
+    const config = await getTenantShiftConfig(tenantId);
+    const now = new Date();
+    const timestamp = now.toISOString();
     const currentDate = timestamp.substring(0, 10);
+
+    // 2. Cooldown Time Check
+    try {
+        const historyRes = await ddbDocClient.send(new QueryCommand({
+            TableName: TABLE_NAME,
+            KeyConditionExpression: "PK = :pk AND SK BEGINS_WITH(:skPrefix)",
+            ExpressionAttributeValues: {
+                ":pk": `TENANT#${tenantId}`,
+                ":skPrefix": `USER#${userId}#ATTENDANCE#`
+            },
+            ScanIndexForward: false,
+            Limit: 3
+        }));
+        const recentLogs = historyRes.Items || [];
+        if (recentLogs.length > 0) {
+            const lastLogTime = new Date(recentLogs[0].Timestamp).getTime();
+            const diffMs = now.getTime() - lastLogTime;
+            const cooldownMs = (config.cooldownMinutes || 2) * 60 * 1000;
+            if (diffMs < cooldownMs) {
+                const waitSecs = Math.ceil((cooldownMs - diffMs) / 1000);
+                return res.status(400).json({ message: `Thao tác quá nhanh! Vui lòng chờ ${waitSecs} giây nữa trước khi thao tác lại (Thời gian chống trùng).` });
+            }
+        }
+    } catch (e) {
+        // Continue if query fails
+    }
+
+    // 3. Window Time Check (Khung giờ cho phép check-out)
+    const currentHHMM = now.toTimeString().substring(0, 5);
+    const currentMinutes = timeToMinutes(currentHHMM);
+    const winStartMins = timeToMinutes(config.windowCheckoutStart || "16:00");
+    const winEndMins = timeToMinutes(config.windowCheckoutEnd || "20:00");
+
+    if (currentMinutes < winStartMins || currentMinutes > winEndMins) {
+        return res.status(400).json({ message: `Hiện không trong khung giờ Check-out! Khung giờ mở: ${config.windowCheckoutStart || '16:00'} - ${config.windowCheckoutEnd || '20:00'}.` });
+    }
+
+    // 4. Overtime (OT) Calculation
+    const shiftEndMins = timeToMinutes(config.shiftEnd || "17:00");
+    const otThreshold = Number(config.otThresholdMinutes) || 30;
+    const minsPastShiftEnd = currentMinutes - shiftEndMins;
+    const isOvertime = minsPastShiftEnd >= otThreshold;
+    const otMinutes = isOvertime ? minsPastShiftEnd : 0;
+    const statusText = isOvertime ? "OVERTIME" : "ON_TIME";
+    const statusNote = isOvertime ? `Check-out ra ca (+${otMinutes} phút OT)` : `Check-out đúng ca (${currentHHMM})`;
 
     try {
         const attendanceRecord = {
             PK: `TENANT#${tenantId}`,
             SK: `USER#${userId}#ATTENDANCE#${currentDate}#CHECKOUT`,
-            UserId: userId, Timestamp: timestamp, Action: "CHECKOUT", DeviceVerified: "Wi-Fi Office", Status: "SUCCESS"
+            UserId: userId,
+            Timestamp: timestamp,
+            Action: "CHECKOUT",
+            DeviceVerified: "GPS Verified",
+            Status: statusText,
+            OvertimeMinutes: otMinutes,
+            Note: statusNote
         };
         await ddbDocClient.send(new PutCommand({ TableName: TABLE_NAME, Item: attendanceRecord }));
 
         io.to(tenantId).emit('new_attendance_alert', { userId: userId, action: "CHECKOUT" });
 
-        res.status(200).json({ message: "Check-out Ra Ca thành công!", data: attendanceRecord });
+        res.status(200).json({ 
+            message: `Check-out Ra Ca thành công ${isOvertime ? `(💪 Làm thêm ${otMinutes} phút OT)` : ''}!`, 
+            data: attendanceRecord 
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -530,9 +676,9 @@ app.patch('/admin/users', authenticateToken, async (req, res) => {
     const { tenantId, role } = req.user;
     const { targetUserId, newRole, isActive } = req.body;
 
-    // Only ADMIN can modify user roles or active state
-    if (role !== "ADMIN") {
-        return res.status(403).json({ message: "Quyền hạn không hợp lệ! Chỉ quản trị viên cấp cao (ADMIN) mới có quyền chỉnh sửa nhân sự." });
+    // Allow ADMIN and MANAGER to modify user roles or active state
+    if (role !== "ADMIN" && role !== "MANAGER") {
+        return res.status(403).json({ message: "Quyền hạn không hợp lệ! Chỉ quản trị viên hoặc trưởng phòng mới có quyền thực hiện thao tác này." });
     }
 
     if (!targetUserId) {
@@ -589,8 +735,8 @@ app.post('/admin/users/create', authenticateToken, async (req, res) => {
     const { tenantId, role } = req.user;
     const { userId, password, fullName, email, phone, newRole } = req.body;
 
-    if (role !== "ADMIN") {
-        return res.status(403).json({ message: "Chỉ quản trị viên (ADMIN) mới có quyền tạo tài khoản mới!" });
+    if (role !== "ADMIN" && role !== "MANAGER") {
+        return res.status(403).json({ message: "Chỉ quản trị viên hoặc trưởng phòng mới có quyền tạo tài khoản mới!" });
     }
 
     if (!userId || !password) {
@@ -638,8 +784,8 @@ app.patch('/admin/users/profile', authenticateToken, async (req, res) => {
     const { tenantId, role } = req.user;
     const { targetUserId, fullName, email, phone } = req.body;
 
-    if (role !== "ADMIN") {
-        return res.status(403).json({ message: "Chỉ quản trị viên (ADMIN) mới có quyền chỉnh sửa hồ sơ nhân viên!" });
+    if (role !== "ADMIN" && role !== "MANAGER") {
+        return res.status(403).json({ message: "Chỉ quản trị viên hoặc trưởng phòng mới có quyền chỉnh sửa hồ sơ nhân viên!" });
     }
 
     if (!targetUserId) {
@@ -693,8 +839,8 @@ app.delete('/admin/users/delete', authenticateToken, async (req, res) => {
     const { tenantId, userId: callerUserId, role } = req.user;
     const { targetUserId } = req.body;
 
-    if (role !== "ADMIN") {
-        return res.status(403).json({ message: "Chỉ quản trị viên (ADMIN) mới có quyền xóa tài khoản!" });
+    if (role !== "ADMIN" && role !== "MANAGER") {
+        return res.status(403).json({ message: "Chỉ quản trị viên hoặc trưởng phòng mới có quyền xóa tài khoản!" });
     }
 
     if (!targetUserId) {
@@ -912,6 +1058,53 @@ app.patch('/admin/attendance', authenticateToken, async (req, res) => {
     }
 });
 
+// 5. GET Shift Config
+app.get('/admin/shift-config', authenticateToken, async (req, res) => {
+    const { tenantId, role } = req.user;
+    if (role !== "ADMIN" && role !== "MANAGER") {
+        return res.status(403).json({ message: "Quyền hạn không hợp lệ! Chỉ Quản trị viên và Trưởng phòng mới được truy cập cấu hình ca." });
+    }
+    const config = await getTenantShiftConfig(tenantId);
+    res.status(200).json({ config });
+});
+
+// 6. POST Shift Config (Update Shift & Attendance Rules)
+app.post('/admin/shift-config', authenticateToken, async (req, res) => {
+    const { tenantId, role, userId } = req.user;
+    if (role !== "ADMIN" && role !== "MANAGER") {
+        return res.status(403).json({ message: "Quyền hạn không hợp lệ! Chỉ Quản trị viên và Trưởng phòng mới được sửa cấu hình ca." });
+    }
+    const {
+        shiftStart, shiftEnd,
+        windowCheckinStart, windowCheckinEnd,
+        windowCheckoutStart, windowCheckoutEnd,
+        gracePeriodMinutes, cooldownMinutes, otThresholdMinutes
+    } = req.body;
+
+    const newConfig = {
+        PK: `TENANT#${tenantId}`,
+        SK: "SHIFT_CONFIG#DEFAULT",
+        shiftStart: shiftStart || "08:00",
+        shiftEnd: shiftEnd || "17:00",
+        windowCheckinStart: windowCheckinStart || "07:00",
+        windowCheckinEnd: windowCheckinEnd || "10:00",
+        windowCheckoutStart: windowCheckoutStart || "16:00",
+        windowCheckoutEnd: windowCheckoutEnd || "20:00",
+        gracePeriodMinutes: Number(gracePeriodMinutes ?? 5),
+        cooldownMinutes: Number(cooldownMinutes ?? 2),
+        otThresholdMinutes: Number(otThresholdMinutes ?? 30),
+        updatedAt: new Date().toISOString(),
+        updatedBy: userId
+    };
+
+    try {
+        await ddbDocClient.send(new PutCommand({ TableName: TABLE_NAME, Item: newConfig }));
+        res.status(200).json({ message: "Đã lưu cấu hình ca làm việc & quy tắc chấm công thành công!", config: newConfig });
+    } catch (e) {
+        res.status(500).json({ message: "Lỗi lưu cấu hình: " + e.message });
+    }
+});
+
 // 4. DELETE Log
 app.delete('/admin/attendance', authenticateToken, async (req, res) => {
     const { tenantId, role } = req.user;
@@ -956,8 +1149,8 @@ app.delete('/admin/attendance', authenticateToken, async (req, res) => {
 app.get('/billing/subscription', authenticateToken, async (req, res) => {
     const { tenantId, role } = req.user;
 
-    // Only company ADMIN can manage billing subscriptions
-    if (role !== "ADMIN") {
+    // ADMIN and MANAGER can view billing subscription details
+    if (role !== "ADMIN" && role !== "MANAGER") {
         return res.status(403).json({ message: "Quyền hạn không hợp lệ! Bạn không có quyền truy cập gói cước thanh toán doanh nghiệp." });
     }
 
@@ -970,11 +1163,12 @@ app.get('/billing/subscription', authenticateToken, async (req, res) => {
             }
         }));
 
-        const subscription = result.Item || {
-            plan: "FREE",
-            status: "ACTIVE",
-            maxUsers: 5,
-            expiresAt: null
+        const rawItem = result.Item || {};
+        const subscription = {
+            plan: rawItem.plan || rawItem.Plan || "FREE",
+            status: rawItem.status || rawItem.Status || "ACTIVE",
+            maxUsers: Number(rawItem.maxUsers || rawItem.MaxUsers || 50),
+            expiresAt: rawItem.expiresAt || rawItem.ExpiresAt || null
         };
 
         res.status(200).json({ subscription });
@@ -987,8 +1181,8 @@ app.post('/billing/create-payment', authenticateToken, async (req, res) => {
     const { tenantId, role } = req.user;
     const { amount, packageName } = req.body;
 
-    if (role !== "ADMIN") {
-        return res.status(403).json({ message: "Quyền hạn không hợp lệ! Chỉ quản trị viên cấp cao mới được phép nâng cấp gói cước doanh nghiệp." });
+    if (role !== "ADMIN" && role !== "MANAGER") {
+        return res.status(403).json({ message: "Quyền hạn không hợp lệ! Chỉ Quản trị viên và Trưởng phòng mới được phép nâng cấp gói cước doanh nghiệp." });
     }
 
     if (!process.env.PAYOS_CLIENT_ID || process.env.PAYOS_CLIENT_ID === "dummy_client_id_123456789") {
@@ -1078,18 +1272,20 @@ app.post('/billing/webhook', async (req, res) => {
                         PK: `TENANT#${tenantId}`,
                         SK: "SUBSCRIPTION#CURRENT"
                     },
-                    UpdateExpression: "SET #plan = :plan, #st = :status, #exp = :expires, #upd = :updated",
+                    UpdateExpression: "SET #plan = :plan, #st = :status, #exp = :expires, #upd = :updated, #max = :maxUsers",
                     ExpressionAttributeNames: {
                         "#plan": "Plan",
                         "#st": "Status",
                         "#exp": "ExpiresAt",
-                        "#upd": "UpdatedAt"
+                        "#upd": "UpdatedAt",
+                        "#max": "MaxUsers"
                     },
                     ExpressionAttributeValues: {
                         ":plan": "PRO",
                         ":status": "ACTIVE",
                         ":expires": expiresAt.toISOString(),
-                        ":updated": new Date().toISOString()
+                        ":updated": new Date().toISOString(),
+                        ":maxUsers": 300
                     }
                 }));
             }

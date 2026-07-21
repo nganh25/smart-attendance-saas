@@ -87,8 +87,8 @@ exports.handler = async (event) => {
 
         // ─── 2. PATCH /admin/users (Role & Active status - Admin only) ───
         if (path === "/admin/users" && method === "PATCH") {
-            if (role !== "ADMIN") {
-                return error(403, "Quyền hạn không hợp lệ: Chỉ quản trị viên cấp cao (ADMIN) mới có quyền chỉnh sửa vai trò.");
+            if (role !== "ADMIN" && role !== "MANAGER") {
+                return error(403, "Quyền hạn không hợp lệ: Chỉ quản trị viên hoặc trưởng phòng mới có quyền chỉnh sửa vai trò.");
             }
 
             const body = JSON.parse(event.body || "{}");

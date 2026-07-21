@@ -6,27 +6,27 @@ import './App.css'
 // ═══════════════════════════════════════════════════════════════
 
 const Icons = {
-  dashboard: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>,
-  clock: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-  history: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/></svg>,
-  report: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>,
-  admin: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
-  profile: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
-  billing: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>,
-  logout: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
-  checkin: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>,
-  checkout: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
-  menu: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
-  wifi: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>,
-  download: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
-  check: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
-  users: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
-  calendar: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
-  activity: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
-  mapPin: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>,
-  shield: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
-  settings: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
-  lock: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
+  dashboard: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>,
+  clock: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>,
+  history: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v5h5" /><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8" /></svg>,
+  report: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><line x1="10" y1="9" x2="8" y2="9" /></svg>,
+  admin: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>,
+  profile: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>,
+  billing: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>,
+  logout: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>,
+  checkin: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><polyline points="10 17 15 12 10 7" /><line x1="15" y1="12" x2="3" y2="12" /></svg>,
+  checkout: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>,
+  menu: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>,
+  wifi: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0" /><path d="M1.42 9a16 16 0 0 1 21.16 0" /><path d="M8.53 16.11a6 6 0 0 1 6.95 0" /><line x1="12" y1="20" x2="12.01" y2="20" /></svg>,
+  download: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>,
+  check: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>,
+  users: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>,
+  calendar: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>,
+  activity: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>,
+  mapPin: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>,
+  shield: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>,
+  settings: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>,
+  lock: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>,
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -40,14 +40,18 @@ const initialAuthForm = {
 }
 
 function App() {
-  // Auth state
-  const [mode, setMode] = useState('login') // login | register | verify
-  const [authForm, setAuthForm] = useState(initialAuthForm)
+  // Auth state - Restore saved session from localStorage on page refresh
   const [token, setToken] = useState(() => localStorage.getItem('attendanceToken') || '')
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('attendanceUser')
-    return saved ? JSON.parse(saved) : null
+    try {
+      const saved = localStorage.getItem('attendanceUser')
+      return saved ? JSON.parse(saved) : null
+    } catch {
+      return null
+    }
   })
+  const [mode, setMode] = useState(() => (localStorage.getItem('attendanceToken') ? 'app' : 'login'))
+  const [authForm, setAuthForm] = useState(initialAuthForm)
 
   // App state
   const [currentPage, setCurrentPage] = useState('dashboard')
@@ -66,22 +70,11 @@ function App() {
   const [reportMonth, setReportMonth] = useState(new Date().toISOString().slice(0, 7))
   const [historyMonth, setHistoryMonth] = useState('')
   const [currentTime, setCurrentTime] = useState(new Date())
-  
+
   // Geolocation Configuration Toggles (Sandbox Testing Console)
-  const [wifiMode, setWifiMode] = useState('OFFICE') // OFFICE (matching BSSID) | OUTSIDE (bad BSSID)
   const [gpsMode, setGpsMode] = useState('OFFICE') // OFFICE (matching coords) | OUTSIDE (bad coords)
-  const [wifiBssid, setWifiBssid] = useState('00:1a:2b:3c:4d:5e')
   const [gpsCoords, setGpsCoords] = useState('Lat: 10.762622, Lng: 106.660172')
   const [gpsStatus, setGpsStatus] = useState('success') // checking | success | failed
-
-  // Dynamic values based on Sandbox Toggles
-  useEffect(() => {
-    if (wifiMode === 'OFFICE') {
-      setWifiBssid('00:1a:2b:3c:4d:5e')
-    } else {
-      setWifiBssid('a1:b2:c3:d4:e5:f6')
-    }
-  }, [wifiMode])
 
   useEffect(() => {
     if (gpsMode === 'OFFICE') {
@@ -112,7 +105,7 @@ function App() {
   const [crudUserId, setCrudUserId] = useState('')
   const [crudUserName, setCrudUserName] = useState('')
   const [crudUserLogs, setCrudUserLogs] = useState([])
-  
+
   // Form states for Create/Update Attendance item
   const [isEditingLog, setIsEditingLog] = useState(false)
   const [editLogOriginalSk, setEditLogOriginalSk] = useState('')
@@ -129,14 +122,27 @@ function App() {
   const [editingUserId, setEditingUserId] = useState('')
 
   // Subscription state
-  const [subscription, setSubscription] = useState({ plan: 'FREE', status: 'ACTIVE', maxUsers: 5, expiresAt: null })
-  
+  const [subscription, setSubscription] = useState({ plan: 'FREE', status: 'ACTIVE', maxUsers: 50, expiresAt: null })
+
   // Checkout Modal State
   const [showCheckoutModal, setShowCheckoutModal] = useState(false)
   const [activeOrder, setActiveOrder] = useState(null)
 
   // Profile edit state
   const [profileForm, setProfileForm] = useState({ fullName: '', email: '', phone: '' })
+
+  // Shift & Attendance rules config state
+  const [shiftConfigForm, setShiftConfigForm] = useState({
+    shiftStart: '08:00',
+    shiftEnd: '17:00',
+    windowCheckinStart: '07:00',
+    windowCheckinEnd: '10:00',
+    windowCheckoutStart: '16:00',
+    windowCheckoutEnd: '20:00',
+    gracePeriodMinutes: 5,
+    cooldownMinutes: 2,
+    otThresholdMinutes: 30
+  })
 
   const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
@@ -192,13 +198,53 @@ function App() {
     return payload
   }, [apiBaseUrl, token])
 
+  // ─── Fetch Shift Config ───
+  const loadShiftConfig = useCallback(async () => {
+    if (user && (user.role === 'ADMIN' || user.role === 'MANAGER')) {
+      try {
+        const data = await requestJson('/admin/shift-config')
+        if (data.config) {
+          setShiftConfigForm({
+            shiftStart: data.config.shiftStart || '08:00',
+            shiftEnd: data.config.shiftEnd || '17:00',
+            windowCheckinStart: data.config.windowCheckinStart || '07:00',
+            windowCheckinEnd: data.config.windowCheckinEnd || '10:00',
+            windowCheckoutStart: data.config.windowCheckoutStart || '16:00',
+            windowCheckoutEnd: data.config.windowCheckoutEnd || '20:00',
+            gracePeriodMinutes: data.config.gracePeriodMinutes ?? 5,
+            cooldownMinutes: data.config.cooldownMinutes ?? 2,
+            otThresholdMinutes: data.config.otThresholdMinutes ?? 30
+          })
+        }
+      } catch (e) {
+        // Ignore
+      }
+    }
+  }, [user, requestJson])
+
+  const handleSaveShiftConfig = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      const data = await requestJson('/admin/shift-config', {
+        method: 'POST',
+        body: JSON.stringify(shiftConfigForm)
+      })
+      showMessage(data.message, 'success')
+    } catch (error) {
+      showMessage(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // ─── Load data on login ───
   const loadHistory = useCallback(async () => {
     try {
       const qParams = [];
       if (historyMonth) qParams.push(`month=${historyMonth}`);
       if (selectedEmployeeId) qParams.push(`userId=${selectedEmployeeId}`);
-      
+
       const queryStr = qParams.length > 0 ? `?${qParams.join('&')}` : '';
       const data = await requestJson(`/attendance/history${queryStr}`)
       setHistory(data.history || [])
@@ -475,17 +521,13 @@ function App() {
     showMessage('Đã đăng xuất khỏi hệ thống', 'info')
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  //  ATTENDANCE HANDLERS
-  // ═══════════════════════════════════════════════════════════════
-
   const handleCheckAction = async (actionType) => {
     setLoading(true)
     try {
       const endpoint = actionType === 'OUT' ? '/attendance/check-out' : '/attendance/check-in'
       const data = await requestJson(endpoint, {
         method: 'POST',
-        body: JSON.stringify({ wifiBssid, gpsLocation: gpsCoords, actionType }),
+        body: JSON.stringify({ gpsLocation: gpsCoords, actionType }),
       })
       showMessage(data.message, 'success')
       await loadHistory()
@@ -711,7 +753,7 @@ function App() {
         action: 'CHECKIN',
         device: 'Điều chỉnh thủ công'
       })
-      
+
       await reloadCrudLogs()
       await fetchEmployeeStatsSummary()
       await loadHistory()
@@ -1030,21 +1072,21 @@ function App() {
                     <div className="card-subtitle">Lịch trình làm việc và ghi nhận thời gian</div>
                   </div>
                 </div>
-                
+
                 <div className="weekly-chart-container" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 'var(--space-md)' }}>
                   {weeklyAttendanceChart.map((d) => {
                     const barClass =
                       d.status === 'CHECKED' ? 'active-gradient' :
-                      d.status === 'PARTIAL' ? 'partial-gradient' : '';
+                        d.status === 'PARTIAL' ? 'partial-gradient' : '';
                     const timeColor =
                       d.status === 'CHECKED' ? '#34d399' :
-                      d.status === 'PARTIAL' ? '#fbbf24' :
-                      'var(--color-text-muted)';
+                        d.status === 'PARTIAL' ? '#fbbf24' :
+                          'var(--color-text-muted)';
                     const timeLabel =
                       d.status === 'CHECKED' ? `${d.checkIn} - ${d.checkOut}` :
-                      d.status === 'PARTIAL' ? `${d.checkIn} (chưa out)` :
-                      d.status === 'FUTURE' ? 'Chưa đến' :
-                      'Nghỉ / Trễ';
+                        d.status === 'PARTIAL' ? `${d.checkIn} (chưa out)` :
+                          d.status === 'FUTURE' ? 'Chưa đến' :
+                            'Nghỉ / Trễ';
 
                     return (
                       <div key={d.day} className="weekly-chart-row" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
@@ -1143,7 +1185,7 @@ function App() {
             <div className="page-header">
               <p className="eyebrow">Chấm công</p>
               <h2>Ghi nhận ca làm việc</h2>
-              <p className="subtitle">Hệ thống an ninh định vị đa tầng. Vui lòng xác nhận mạng Wi-Fi và Tọa độ GPS.</p>
+              <p className="subtitle">Xác thực định vị GPS tự động để ghi nhận giờ ra vào ca làm việc chính xác.</p>
             </div>
 
             <div className="content-grid cols-2" style={{ alignItems: 'start' }}>
@@ -1152,7 +1194,7 @@ function App() {
                   <div className="card-title">Ghi nhận giờ làm việc</div>
                 </div>
                 <div style={{ padding: 'var(--space-sm) 0 var(--space-md)' }}>
-                  <div className="live-clock">
+                  <div className="live-clock" style={{ background: 'linear-gradient(135deg, #0284c7 0%, #38bdf8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                     {currentTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                   </div>
                   <div className="live-clock-date">
@@ -1160,22 +1202,23 @@ function App() {
                   </div>
                 </div>
 
-                <div className="wifi-section">
-                  <div className="wifi-label">Thông tin kiểm tra thiết bị</div>
-                  
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
-                    <div className="wifi-value">
-                      <span className={`wifi-status-dot ${wifiMode === 'OFFICE' ? 'active-green' : 'active-red'}`}></span>
-                      {Icons.wifi}
-                      <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>Mạng Wi-Fi:</span>
-                      <strong style={{ fontFamily: 'monospace' }}>{wifiBssid}</strong>
-                    </div>
-                    
-                    <div className="wifi-value">
-                      <span className={`wifi-status-dot ${gpsMode === 'OFFICE' ? 'active-green' : gpsMode === 'OUTSIDE' ? 'active-red' : 'checking'}`}></span>
+                <div className="wifi-section" style={{ background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(6, 182, 212, 0.03) 100%)', border: '1px solid rgba(14, 165, 233, 0.25)', borderRadius: 'var(--radius-lg)', padding: 'var(--space-md)' }}>
+                  <div className="wifi-label" style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 'var(--space-sm)' }}>
+                    📍 Thông tin vị trí GPS
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem' }}>
+                      <span className={`wifi-status-dot ${gpsMode === 'OFFICE' ? 'active-green' : 'active-red'}`}></span>
                       {Icons.mapPin}
-                      <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>Định vị GPS:</span>
-                      <strong style={{ fontFamily: 'monospace' }}>{gpsCoords}</strong>
+                      <span style={{ color: 'var(--color-text-secondary)' }}>Tọa độ hiện tại:</span>
+                      <strong style={{ fontFamily: 'monospace', color: 'var(--color-accent-hover)' }}>{gpsCoords}</strong>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', marginTop: '4px' }}>
+                      <span className="badge active" style={{ background: gpsMode === 'OFFICE' ? 'rgba(52, 211, 153, 0.15)' : 'rgba(248, 113, 113, 0.15)', color: gpsMode === 'OFFICE' ? '#34d399' : '#f87171', border: gpsMode === 'OFFICE' ? '1px solid rgba(52, 211, 153, 0.3)' : '1px solid rgba(248, 113, 113, 0.3)', padding: '3px 10px', borderRadius: 'var(--radius-full)' }}>
+                        {gpsMode === 'OFFICE' ? '● Trong phạm vi văn phòng' : '● Vẫn ở ngoài văn phòng'}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -1193,74 +1236,52 @@ function App() {
               </div>
 
               {/* Sandbox Testing Console */}
-              <div className="card" style={{ border: '1px dashed rgba(168, 85, 247, 0.4)' }}>
+              <div className="card" style={{ border: '1px solid rgba(14, 165, 233, 0.25)', boxShadow: '0 8px 32px rgba(14, 165, 233, 0.08)' }}>
                 <div className="card-header">
                   <div>
-                    <div className="card-title" style={{ color: '#c084fc', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      {Icons.settings} Bảng điều khiển giả lập (Sandbox)
+                    <div className="card-title" style={{ color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {Icons.settings} Giả lập vị trí GPS (Sandbox)
                     </div>
-                    <div className="card-subtitle">Mô phỏng thiết bị để kiểm thử các quy tắc an ninh chấm công</div>
+                    <div className="card-subtitle">Mô phỏng tọa độ GPS để kiểm thử quy tắc an ninh định vị ca làm việc</div>
                   </div>
                 </div>
-                
+
                 <div className="form-stack">
                   <div className="form-group">
-                    <label className="form-label" style={{ color: '#c084fc' }}>Giả lập kết nối mạng Wi-Fi</label>
-                    <div style={{ display: 'flex', gap: 'var(--space-sm)' }}>
-                      <button 
-                        type="button" 
-                        className={`btn btn-sm ${wifiMode === 'OFFICE' ? 'btn-primary' : 'btn-ghost'}`} 
-                        onClick={() => setWifiMode('OFFICE')}
-                        style={{ flex: 1 }}
-                      >
-                        Đúng Wi-Fi Công ty
-                      </button>
-                      <button 
-                        type="button" 
-                        className={`btn btn-sm ${wifiMode === 'OUTSIDE' ? 'btn-danger' : 'btn-ghost'}`} 
-                        onClick={() => setWifiMode('OUTSIDE')}
-                        style={{ flex: 1 }}
-                      >
-                        Sai Wi-Fi Mạng ngoài
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label" style={{ color: '#c084fc' }}>Giả lập định vị vệ tinh GPS</label>
+                    <label className="form-label" style={{ color: '#38bdf8' }}>Giả lập định vị vệ tinh GPS</label>
                     <div style={{ display: 'flex', gap: 'var(--space-sm)', flexDirection: 'column' }}>
                       <div style={{ display: 'flex', gap: 'var(--space-sm)' }}>
-                        <button 
-                          type="button" 
-                          className={`btn btn-sm ${gpsMode === 'OFFICE' ? 'btn-primary' : 'btn-ghost'}`} 
+                        <button
+                          type="button"
+                          className={`btn btn-sm ${gpsMode === 'OFFICE' ? 'btn-primary' : 'btn-ghost'}`}
                           onClick={() => setGpsMode('OFFICE')}
-                          style={{ flex: 1 }}
+                          style={{ flex: 1, fontWeight: 700 }}
                         >
-                          Trong Văn phòng
+                          📍 Trong Văn phòng
                         </button>
-                        <button 
-                          type="button" 
-                          className={`btn btn-sm ${gpsMode === 'OUTSIDE' ? 'btn-danger' : 'btn-ghost'}`} 
+                        <button
+                          type="button"
+                          className={`btn btn-sm ${gpsMode === 'OUTSIDE' ? 'btn-danger' : 'btn-ghost'}`}
                           onClick={() => setGpsMode('OUTSIDE')}
-                          style={{ flex: 1 }}
+                          style={{ flex: 1, fontWeight: 700 }}
                         >
-                          Ngoài Văn phòng
+                          🚗 Ngoài Văn phòng
                         </button>
                       </div>
-                      
-                      <button 
-                        type="button" 
-                        className="btn btn-ghost btn-sm" 
+
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
                         onClick={fetchRealGpsLocation}
-                        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center', fontWeight: 600 }}
                       >
                         {Icons.mapPin} Lấy GPS thực tế từ Trình duyệt
                       </button>
                     </div>
                   </div>
-                  
-                  <div style={{ background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', padding: 'var(--space-md)', borderRadius: 'var(--radius-md)', fontSize: '0.8rem', color: 'var(--color-text-secondary)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
-                    💡 <strong>Mẹo kiểm thử:</strong> Đặt chế độ <em>Sai Wi-Fi Mạng ngoài</em> và nhấn Check-in. Hệ thống sẽ trả về lỗi từ chối ghi nhận ngay lập tức!
+
+                  <div style={{ background: 'rgba(14, 165, 233, 0.08)', border: '1px solid rgba(14, 165, 233, 0.25)', padding: 'var(--space-md)', borderRadius: 'var(--radius-md)', fontSize: '0.8rem', color: 'var(--color-text-secondary)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
+                    💡 <strong>Mẹo kiểm thử:</strong> Đặt chế độ <em>Ngoài Văn phòng</em> và nhấn Check-in. Hệ thống sẽ đối soát tọa độ GPS và từ chối ghi nhận ngay lập tức!
                   </div>
                 </div>
               </div>
@@ -1275,8 +1296,8 @@ function App() {
               <p className="eyebrow">Lịch sử</p>
               <h2>Nhật ký chấm công</h2>
               <p className="subtitle">
-                {user.role === 'ADMIN' || user.role === 'MANAGER' 
-                  ? 'Quản lý lịch sử chấm công của tất cả nhân sự doanh nghiệp.' 
+                {user.role === 'ADMIN' || user.role === 'MANAGER'
+                  ? 'Quản lý lịch sử chấm công của tất cả nhân sự doanh nghiệp.'
                   : 'Xem lại toàn bộ bản ghi chấm công của bạn.'}
               </p>
             </div>
@@ -1284,15 +1305,15 @@ function App() {
             <div className="card">
               <div className="card-header">
                 <div className="card-title">Bản ghi chấm công</div>
-                
+
                 <div className="inline-actions">
                   {/* Privileged Feature: Filter logs by target employee (Manager/Admin Only) */}
                   {(user.role === 'ADMIN' || user.role === 'MANAGER') && (
                     <div className="form-group">
                       <label className="form-label">Chọn nhân sự</label>
-                      <select 
-                        className="form-select" 
-                        value={selectedEmployeeId} 
+                      <select
+                        className="form-select"
+                        value={selectedEmployeeId}
                         onChange={(e) => setSelectedEmployeeId(e.target.value)}
                         style={{ minWidth: '180px' }}
                       >
@@ -1338,7 +1359,24 @@ function App() {
                           <td>{new Date(item.Timestamp).toLocaleDateString('vi-VN')}</td>
                           <td style={{ fontVariantNumeric: 'tabular-nums' }}>{new Date(item.Timestamp).toLocaleTimeString('vi-VN')}</td>
                           <td>{item.DeviceVerified}</td>
-                          <td><span className="badge active"><span className="badge-dot"></span>{item.Status}</span></td>
+                          <td>
+                            {item.Status === 'LATE' ? (
+                              <span className="badge inactive" style={{ background: 'rgba(248, 113, 113, 0.15)', color: '#f87171', border: '1px solid rgba(248, 113, 113, 0.3)' }}>
+                                ⚠️ Đi muộn
+                              </span>
+                            ) : item.Status === 'ON_TIME' ? (
+                              <span className="badge active" style={{ background: 'rgba(52, 211, 153, 0.15)', color: '#34d399', border: '1px solid rgba(52, 211, 153, 0.3)' }}>
+                                ✅ Đúng giờ
+                              </span>
+                            ) : item.Status === 'OVERTIME' ? (
+                              <span className="badge active" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+                                💪 OT ({item.OvertimeMinutes || 0}m)
+                              </span>
+                            ) : (
+                              <span className="badge active"><span className="badge-dot"></span>{item.Status}</span>
+                            )}
+                            {item.Note && <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>{item.Note}</div>}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -1372,13 +1410,12 @@ function App() {
                 <div className="card-title">Xuất báo cáo Excel</div>
               </div>
               <form className="form-stack" onSubmit={handleExportReport}>
-                {/* Privileged Feature: Choose which employee report to export (Manager/Admin Only) */}
                 {(user.role === 'ADMIN' || user.role === 'MANAGER') && (
                   <div className="form-group">
                     <label className="form-label">Phạm vi nhân sự xuất báo cáo</label>
-                    <select 
-                      className="form-select" 
-                      value={reportEmployeeId} 
+                    <select
+                      className="form-select"
+                      value={reportEmployeeId}
                       onChange={(e) => setReportEmployeeId(e.target.value)}
                     >
                       <option value="ALL">Tất cả nhân sự (Tổng hợp)</option>
@@ -1391,7 +1428,6 @@ function App() {
                     </select>
                   </div>
                 )}
-
                 <div className="form-group">
                   <label className="form-label">Chọn tháng báo cáo</label>
                   <input className="form-input" type="month" value={reportMonth} onChange={(e) => setReportMonth(e.target.value)} />
@@ -1451,43 +1487,79 @@ function App() {
         )
 
       case 'admin':
+        const canManage = user.role === 'ADMIN' || user.role === 'MANAGER'
+        const planName = subscription?.plan || subscription?.Plan || 'FREE'
+        const defaultMax = planName === 'PRO' ? 300 : 50
+        const maxAllowed = Number(subscription?.maxUsers || subscription?.MaxUsers || defaultMax)
+        const usagePercent = Math.min(100, Math.round((adminUsers.length / maxAllowed) * 100)) || 0
+
         return (
           <>
             <div className="page-header">
-              <p className="eyebrow">Quản trị</p>
-              <h2>Quản lý nhân sự</h2>
+              <p className="eyebrow">Quản trị hệ thống</p>
+              <h2>Quản lý nhân sự & Giấy phép</h2>
               <p className="subtitle">
                 {user.role === 'ADMIN' 
-                  ? 'Quyền hạn: Quản trị viên cấp cao (ADMIN) — Toàn quyền thay đổi vai trò, cấu hình và điều chỉnh nhật ký công.'
-                  : 'Quyền hạn: Trưởng phòng (MANAGER) — Quyền giám sát nhân viên và xem chi tiết nhật ký.'}
+                  ? 'Quyền hạn: Quản trị viên cấp cao (ADMIN) — Toàn quyền quản lý nhân sự, nâng cấp gói và điều chỉnh hệ thống.'
+                  : 'Quyền hạn: Trưởng phòng (MANAGER) — Quyền quản lý nhân viên (CRUD), duyệt hồ sơ và điều chỉnh nhật ký chấm công.'}
               </p>
             </div>
 
-            {/* Account limit progress bar */}
-            <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-sm)' }}>
-                <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Tỷ lệ sử dụng giấy phép (Giới hạn tài khoản)</span>
-                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-accent-hover)' }}>
-                  {adminUsers.length} / {subscription.maxUsers} nhân viên
-                </span>
-              </div>
-              <div style={{ width: '100%', height: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--radius-full)', overflow: 'hidden', border: '1px solid var(--color-border-subtle)', marginBottom: 'var(--space-sm)' }}>
-                <div 
-                  className="bar-fill active-gradient" 
-                  style={{ width: `${Math.min(100, (adminUsers.length / subscription.maxUsers) * 100)}%`, height: '100%', borderRadius: 'var(--radius-full)' }}
-                ></div>
-              </div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-                {subscription.plan === 'FREE' ? (
-                  <span>⚠️ Bạn đang sử dụng gói Miễn phí (tối đa 5 nhân viên). {user.role === 'ADMIN' ? 'Để mở rộng, vui lòng nâng cấp gói Pro.' : 'Liên hệ Admin để nâng cấp.'}</span>
-                ) : (
-                  <span>✅ Đang sử dụng gói Pro cao cấp với giới hạn tối đa 50 nhân viên.</span>
+            {/* Prominent Subscription Plan Info Banner */}
+            <div className="card" style={{ marginBottom: 'var(--space-lg)', background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.12) 0%, rgba(6, 182, 212, 0.04) 100%)', border: '1px solid rgba(14, 165, 233, 0.28)', boxShadow: '0 8px 32px rgba(14, 165, 233, 0.12)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-md)', marginBottom: 'var(--space-md)' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>
+                      Gói dịch vụ SaaS
+                    </span>
+                    <span className="badge active" style={{ background: 'linear-gradient(135deg, #0284c7, #06b6d4)', color: 'white', fontWeight: 800, padding: '4px 14px', fontSize: '0.75rem', borderRadius: 'var(--radius-full)', letterSpacing: '0.05em' }}>
+                      {planName} PLAN
+                    </span>
+                    <span style={{ fontSize: '0.8rem', color: '#34d399', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      ● Đang hoạt động
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
+                    Giới hạn quy mô tối đa: <strong>{maxAllowed} nhân viên</strong>. {planName === 'FREE' ? 'Chấm công GPS, Xuất báo cáo Excel.' : 'Chấm công GPS an ninh cao, Real-time Socket.IO, Webhook.'}
+                  </p>
+                </div>
+
+                {(user.role === 'ADMIN' || user.role === 'MANAGER') && (
+                  <button 
+                    className="btn btn-primary btn-sm" 
+                    onClick={() => setCurrentPage('billing')}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', background: 'var(--gradient-primary)', fontWeight: 700 }}
+                  >
+                    {Icons.billing} Nâng cấp gói Pro ngay
+                  </button>
                 )}
+              </div>
+
+              {/* Usage Progress Bar */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '6px' }}>
+                  <span style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>Tỷ lệ sử dụng tài khoản nhân sự:</span>
+                  <span style={{ fontWeight: 700, color: 'var(--color-accent-hover)' }}>
+                    {adminUsers.length} / {maxAllowed} nhân viên ({usagePercent}%)
+                  </span>
+                </div>
+                <div style={{ width: '100%', height: '10px', background: 'rgba(0,0,0,0.35)', borderRadius: 'var(--radius-full)', overflow: 'hidden', border: '1px solid var(--color-border-subtle)' }}>
+                  <div 
+                    style={{ 
+                      width: `${usagePercent}%`, 
+                      height: '100%', 
+                      background: 'linear-gradient(90deg, #0284c7, #38bdf8)',
+                      borderRadius: 'var(--radius-full)',
+                      transition: 'width 0.5s ease-in-out'
+                    }}
+                  ></div>
+                </div>
               </div>
             </div>
 
             {/* Sub navigation buttons inside Admin tab */}
-            <div className="auth-tabs" style={{ marginBottom: 'var(--space-lg)', maxWidth: '350px' }}>
+            <div className="auth-tabs" style={{ marginBottom: 'var(--space-lg)', maxWidth: '550px' }}>
               <button 
                 type="button" 
                 className={`auth-tab ${adminTabMode === 'users' ? 'active' : ''}`} 
@@ -1502,23 +1574,24 @@ function App() {
               >
                 Bảng thống kê chấm công
               </button>
+              <button 
+                type="button" 
+                className={`auth-tab ${adminTabMode === 'shift' ? 'active' : ''}`} 
+                onClick={() => { setAdminTabMode('shift'); loadShiftConfig(); }}
+              >
+                ⚙️ Cấu hình Ca & Quy tắc
+              </button>
             </div>
 
-            {adminTabMode === 'users' ? (
+            {adminTabMode === 'users' && (
               <div className="card">
                 <div className="card-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-sm)' }}>
                   <div className="card-title">Danh sách nhân viên ({adminUsers.length})</div>
                   
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
-                    {user.role === 'MANAGER' && (
-                      <span className="badge active" style={{ background: 'rgba(251,191,36,0.1)', color: '#fbbf24', border: '1px solid rgba(251,191,36,0.2)' }}>
-                        {Icons.lock} Chỉ đọc (Manager Mode)
-                      </span>
-                    )}
-                    
-                    {user.role === 'ADMIN' && (
-                      <button className="btn btn-accent btn-sm" onClick={openCreateUserModal} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    {canManage && (
+                      <button className="btn btn-primary btn-sm" onClick={openCreateUserModal} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 700 }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
                         Thêm nhân viên
                       </button>
                     )}
@@ -1537,7 +1610,7 @@ function App() {
                           <th>SĐT</th>
                           <th>Vai trò</th>
                           <th>Trạng thái</th>
-                          <th style={{ width: '210px' }}>Thao tác</th>
+                          <th style={{ width: '230px', minWidth: '230px' }}>Thao tác CRUD</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1553,7 +1626,7 @@ function App() {
                                   className="form-select"
                                   value={u.role}
                                   onChange={(e) => handleUpdateUserRole(u.userId, e.target.value)}
-                                  style={{ padding: '4px 28px 4px 8px', fontSize: '0.75rem' }}
+                                  style={{ padding: '4px 24px 4px 8px', fontSize: '0.75rem', fontWeight: 600 }}
                                 >
                                   <option value="EMPLOYEE">Employee</option>
                                   <option value="MANAGER">Manager</option>
@@ -1570,7 +1643,7 @@ function App() {
                               </span>
                             </td>
                             <td>
-                              {user.role === 'ADMIN' ? (
+                              {canManage ? (
                                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                                   <button className="btn btn-ghost btn-sm" title="Sửa hồ sơ" onClick={() => openEditUserModal(u)} style={{ padding: '4px 8px', fontSize: '0.75rem' }}>
                                     ✏️ Sửa
@@ -1579,10 +1652,17 @@ function App() {
                                     className={`btn btn-sm ${u.isActive ? 'btn-danger' : 'btn-success'}`}
                                     onClick={() => handleToggleUserActive(u.userId, !u.isActive)}
                                     style={{ padding: '4px 8px', fontSize: '0.75rem' }}
+                                    disabled={user.role === 'MANAGER' && u.role === 'ADMIN'}
                                   >
                                     {u.isActive ? '🔒 Khóa' : '🔓 Mở'}
                                   </button>
-                                  <button className="btn btn-sm btn-danger" title="Xóa vĩnh viễn" onClick={() => handleDeleteUser(u.userId)} style={{ padding: '4px 8px', fontSize: '0.75rem' }}>
+                                  <button
+                                    className="btn btn-sm btn-danger"
+                                    title="Xóa vĩnh viễn"
+                                    onClick={() => handleDeleteUser(u.userId)}
+                                    style={{ padding: '4px 8px', fontSize: '0.75rem' }}
+                                    disabled={user.role === 'MANAGER' && u.role === 'ADMIN'}
+                                  >
                                     🗑️ Xóa
                                   </button>
                                 </div>
@@ -1604,8 +1684,9 @@ function App() {
                   </div>
                 )}
               </div>
-            ) : (
-              /* Attendance Statistics Table per person containing CRUD action buttons */
+            )}
+
+            {adminTabMode === 'stats' && (
               <div className="card">
                 <div className="card-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div className="card-title">Thống kê chấm công theo nhân sự</div>
@@ -1635,15 +1716,15 @@ function App() {
                               <span className={`role-badge`}>{s.role}</span>
                             </td>
                             <td style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 600, color: '#34d399' }}>{s.checkins}</td>
-                            <td style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 600, color: '#60a5fa' }}>{s.checkouts}</td>
+                            <td style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 600, color: '#38bdf8' }}>{s.checkouts}</td>
                             <td style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 700, color: 'var(--color-accent-hover)' }}>{s.days} ngày</td>
                             <td>
-                              <button 
-                                className="btn btn-sm btn-ghost" 
-                                style={{ borderColor: 'rgba(99,102,241,0.2)', color: '#818cf8' }}
+                              <button
+                                className="btn btn-sm btn-ghost"
+                                style={{ borderColor: 'rgba(14,165,233,0.3)', color: '#38bdf8' }}
                                 onClick={() => openAttendanceCrud(s.userId, s.fullName)}
                               >
-                                {user.role === 'ADMIN' ? '🛠️ Điều chỉnh' : '👁️ Xem chi tiết'}
+                                🛠️ Điều chỉnh logs
                               </button>
                             </td>
                           </tr>
@@ -1659,64 +1740,214 @@ function App() {
                 )}
               </div>
             )}
+
+            {adminTabMode === 'shift' && (
+              <div className="card">
+                <div className="card-header" style={{ marginBottom: 'var(--space-md)' }}>
+                  <div>
+                    <h3 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      ⚙️ Cấu hình Ca làm việc & Quy tắc Chấm công
+                    </h3>
+                    <p className="subtitle" style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
+                      Thiết lập khung giờ chuẩn, dung sai đi muộn, khoảng cách chống trùng log và mốc thời gian tính OT.
+                    </p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleSaveShiftConfig}>
+                  {/* Group 1: Shift Time */}
+                  <div style={{ background: 'rgba(0,0,0,0.15)', padding: 'var(--space-md)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-md)', border: '1px solid var(--color-border-subtle)' }}>
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: 'var(--space-sm)', color: 'var(--color-accent-hover)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      🕒 Ca làm việc chuẩn (Shift Time)
+                    </h4>
+                    <div className="content-grid cols-2" style={{ gap: 'var(--space-md)' }}>
+                      <div className="form-group">
+                        <label className="form-label">Giờ bắt đầu ca (Check-in chuẩn)</label>
+                        <input 
+                          type="time" 
+                          className="form-input" 
+                          value={shiftConfigForm.shiftStart} 
+                          onChange={(e) => setShiftConfigForm(prev => ({ ...prev, shiftStart: e.target.value }))}
+                          required 
+                        />
+                        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>Mặc định: 08:00</span>
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Giờ kết thúc ca (Check-out chuẩn)</label>
+                        <input 
+                          type="time" 
+                          className="form-input" 
+                          value={shiftConfigForm.shiftEnd} 
+                          onChange={(e) => setShiftConfigForm(prev => ({ ...prev, shiftEnd: e.target.value }))}
+                          required 
+                        />
+                        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>Mặc định: 17:00</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Group 2: Window Time */}
+                  <div style={{ background: 'rgba(0,0,0,0.15)', padding: 'var(--space-md)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-md)', border: '1px solid var(--color-border-subtle)' }}>
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: 'var(--space-sm)', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      🪟 Khung giờ cho phép chấm công (Window Time)
+                    </h4>
+                    <div className="content-grid cols-2" style={{ gap: 'var(--space-md)' }}>
+                      <div className="form-group">
+                        <label className="form-label">Khung giờ mở nhận Check-in</label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <input type="time" className="form-input" value={shiftConfigForm.windowCheckinStart} onChange={(e) => setShiftConfigForm(p => ({ ...p, windowCheckinStart: e.target.value }))} required />
+                          <span style={{ color: 'var(--color-text-secondary)' }}>đến</span>
+                          <input type="time" className="form-input" value={shiftConfigForm.windowCheckinEnd} onChange={(e) => setShiftConfigForm(p => ({ ...p, windowCheckinEnd: e.target.value }))} required />
+                        </div>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>Ví dụ: 07:00 - 10:00</span>
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Khung giờ mở nhận Check-out</label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <input type="time" className="form-input" value={shiftConfigForm.windowCheckoutStart} onChange={(e) => setShiftConfigForm(p => ({ ...p, windowCheckoutStart: e.target.value }))} required />
+                          <span style={{ color: 'var(--color-text-secondary)' }}>đến</span>
+                          <input type="time" className="form-input" value={shiftConfigForm.windowCheckoutEnd} onChange={(e) => setShiftConfigForm(p => ({ ...p, windowCheckoutEnd: e.target.value }))} required />
+                        </div>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>Ví dụ: 16:00 - 20:00</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Group 3: Grace Period & Cooldown Time */}
+                  <div style={{ background: 'rgba(0,0,0,0.15)', padding: 'var(--space-md)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-md)', border: '1px solid var(--color-border-subtle)' }}>
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: 'var(--space-sm)', color: '#a78bfa', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      ⏱️ Dung sai & Chống ghi nhận trùng dư thừa
+                    </h4>
+                    <div className="content-grid cols-2" style={{ gap: 'var(--space-md)' }}>
+                      <div className="form-group">
+                        <label className="form-label">Thời gian dung sai đi muộn (Grace Period)</label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <input 
+                            type="number" 
+                            min="0" 
+                            max="60" 
+                            className="form-input" 
+                            value={shiftConfigForm.gracePeriodMinutes} 
+                            onChange={(e) => setShiftConfigForm(p => ({ ...p, gracePeriodMinutes: e.target.value }))}
+                            required 
+                          />
+                          <span style={{ whiteSpace: 'nowrap', color: 'var(--color-text-secondary)' }}>phút</span>
+                        </div>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>Check-in trước ({shiftConfigForm.shiftStart} + {shiftConfigForm.gracePeriodMinutes} phút) vẫn tính Đúng giờ</span>
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Thời gian chống trùng lặp (Cooldown Time)</label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <input 
+                            type="number" 
+                            min="1" 
+                            max="30" 
+                            className="form-input" 
+                            value={shiftConfigForm.cooldownMinutes} 
+                            onChange={(e) => setShiftConfigForm(p => ({ ...p, cooldownMinutes: e.target.value }))}
+                            required 
+                          />
+                          <span style={{ whiteSpace: 'nowrap', color: 'var(--color-text-secondary)' }}>phút</span>
+                        </div>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>Thời gian nghỉ tối thiểu giữa 2 lần bấm máy liên tiếp</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Group 4: OT Rules */}
+                  <div style={{ background: 'rgba(0,0,0,0.15)', padding: 'var(--space-md)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-lg)', border: '1px solid var(--color-border-subtle)' }}>
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: 'var(--space-sm)', color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      💪 Quy tắc Làm thêm giờ (OT Rules)
+                    </h4>
+                    <div className="form-group" style={{ maxWidth: '400px' }}>
+                      <label className="form-label">Mốc tối thiểu bắt đầu tính OT sau ca</label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <input 
+                          type="number" 
+                          min="0" 
+                          max="180" 
+                          className="form-input" 
+                          value={shiftConfigForm.otThresholdMinutes} 
+                          onChange={(e) => setShiftConfigForm(p => ({ ...p, otThresholdMinutes: e.target.value }))}
+                          required 
+                        />
+                        <span style={{ whiteSpace: 'nowrap', color: 'var(--color-text-secondary)' }}>phút</span>
+                      </div>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>Làm thêm trên {shiftConfigForm.otThresholdMinutes} phút sau giờ kết thúc ({shiftConfigForm.shiftEnd}) mới bắt đầu tính OT</span>
+                    </div>
+                  </div>
+
+                  <button type="submit" className="btn btn-primary" disabled={loading} style={{ padding: '12px 24px', fontWeight: 700 }}>
+                    {loading ? <><span className="spinner"></span> Đang lưu...</> : <>💾 Lưu cấu hình ca làm việc</>}
+                  </button>
+                </form>
+              </div>
+            )}
           </>
         )
 
       case 'billing':
+        const billingPlan = subscription?.plan || subscription?.Plan || 'FREE'
+        const defaultBillingMax = billingPlan === 'PRO' ? 300 : 50
+        const billingMax = Number(subscription?.maxUsers || subscription?.MaxUsers || defaultBillingMax)
+        const billingStatus = subscription?.status || subscription?.Status || 'ACTIVE'
+
         return (
           <>
             <div className="page-header">
               <p className="eyebrow">Gói dịch vụ</p>
               <h2>Nâng cấp doanh nghiệp</h2>
-              <p className="subtitle">Quản lý nâng cấp thanh toán doanh nghiệp (Quyền Admin).</p>
+              <p className="subtitle">Quản lý nâng cấp thanh toán doanh nghiệp (Quyền Admin & Manager).</p>
             </div>
 
             <div className="stats-grid" style={{ marginBottom: 'var(--space-lg)' }}>
               <div className="stat-card accent">
                 <div className="stat-icon">{Icons.shield}</div>
-                <div className="stat-value">{subscription.plan}</div>
-                <div className="stat-label">Gói hiện tại ({subscription.status === 'ACTIVE' ? 'Kích hoạt' : 'Hết hạn'})</div>
+                <div className="stat-value">{billingPlan} PLAN</div>
+                <div className="stat-label">Gói hiện tại ({billingStatus === 'ACTIVE' ? 'Đang hoạt động' : 'Hết hạn'})</div>
               </div>
               <div className="stat-card info">
                 <div className="stat-icon">{Icons.users}</div>
-                <div className="stat-value">{subscription.maxUsers} nhân viên</div>
+                <div className="stat-value">{billingMax} nhân viên</div>
                 <div className="stat-label">Giới hạn tài khoản tối đa</div>
               </div>
             </div>
 
             <div className="content-grid cols-3">
               <div className="plan-card">
-                <div className="plan-name">Miễn phí</div>
+                <div className="plan-name">Cơ bản (Miễn phí)</div>
                 <div className="plan-price">0₫ <span>/ tháng</span></div>
                 <ul className="plan-features">
-                  <li>Tối đa 5 nhân viên</li>
-                  <li>Chấm công Wi-Fi</li>
-                  <li>Xuất báo cáo cơ bản</li>
-                  <li>Hỗ trợ email</li>
+                  <li>Tối đa <strong>50 nhân viên</strong></li>
+                  <li>Chấm công định vị GPS</li>
+                  <li>Xuất báo cáo Excel</li>
+                  <li>Hỗ trợ email 24/7</li>
                 </ul>
-                <button className="btn btn-ghost" style={{ width: '100%' }} disabled={subscription.plan === 'FREE'}>
-                  {subscription.plan === 'FREE' ? 'Gói hiện tại' : 'Mặc định'}
+                <button className="btn btn-ghost" style={{ width: '100%' }} disabled={billingPlan === 'FREE'}>
+                  {billingPlan === 'FREE' ? 'Gói hiện tại' : 'Gói Mặc định'}
                 </button>
               </div>
 
               <div className="plan-card recommended">
-                <div className="plan-name">Pro</div>
+                <div className="plan-name">Pro (Khuyên dùng)</div>
                 <div className="plan-price">299.000₫ <span>/ tháng</span></div>
                 <ul className="plan-features">
-                  <li>Tối đa 50 nhân viên</li>
-                  <li>Chấm công Wi-Fi + GPS</li>
-                  <li>Báo cáo nâng cao</li>
-                  <li>Quản trị nhân sự</li>
-                  <li>Webhook thông báo</li>
-                  <li>Hỗ trợ ưu tiên</li>
+                  <li>Tối đa <strong>300 nhân viên</strong></li>
+                  <li>Chấm công GPS an ninh cao</li>
+                  <li>Báo cáo Excel nâng cao</li>
+                  <li>Quản trị nhân sự & Phân quyền</li>
+                  <li>Webhook & Realtime Alert</li>
+                  <li>Hỗ trợ ưu tiên 24/7</li>
                 </ul>
-                <button 
-                  className="btn btn-primary" 
-                  style={{ width: '100%' }} 
+                <button
+                  className="btn btn-primary"
+                  style={{ width: '100%' }}
                   onClick={() => handleUpgrade('PRO', 299000)}
-                  disabled={loading || subscription.plan === 'PRO'}
+                  disabled={loading || billingPlan === 'PRO'}
                 >
-                  {subscription.plan === 'PRO' ? 'Gói hiện tại' : 'Nâng cấp Pro'}
+                  {billingPlan === 'PRO' ? 'Gói hiện tại' : 'Nâng cấp Pro ngay'}
                 </button>
               </div>
 
@@ -1724,15 +1955,15 @@ function App() {
                 <div className="plan-name">Enterprise</div>
                 <div className="plan-price">Liên hệ</div>
                 <ul className="plan-features">
-                  <li>Không giới hạn nhân viên</li>
+                  <li>Trên <strong>300 nhân viên</strong> (Không giới hạn)</li>
                   <li>Multi-tenant isolation</li>
                   <li>SSO / SAML / OIDC</li>
-                  <li>API tùy chỉnh</li>
-                  <li>SLA 99.9%</li>
-                  <li>Dedicated support</li>
+                  <li>API tùy chỉnh doanh nghiệp</li>
+                  <li>Cam kết SLA 99.9%</li>
+                  <li>Dedicated Support Manager</li>
                 </ul>
                 <button className="btn btn-ghost" style={{ width: '100%' }} onClick={() => showMessage('Vui lòng liên hệ sales@smartattendance.vn', 'info')}>
-                  Liên hệ
+                  Liên hệ Doanh nghiệp
                 </button>
               </div>
             </div>
@@ -1772,8 +2003,8 @@ function App() {
             if (item.type === 'divider') return <div key={item.id} className="nav-divider" />
             // Role enforcement tab visibility
             if (item.adminOnly && user.role !== 'ADMIN' && user.role !== 'MANAGER') return null;
-            if (item.billingOnly && user.role !== 'ADMIN') return null;
-            
+            if (item.billingOnly && user.role !== 'ADMIN' && user.role !== 'MANAGER') return null;
+
             return (
               <button
                 key={item.id}
@@ -1807,7 +2038,7 @@ function App() {
             </div>
             <div className="user-details">
               <div className="name">{user.fullName || user.userId}</div>
-              <span className={`role-badge`}>{user.role || 'EMPLOYEE'}</span>
+              <span className={`role-badge role-${(user.role || 'employee').toLowerCase()}`}>{user.role || 'EMPLOYEE'}</span>
             </div>
           </div>
           <button className="logout-btn" onClick={handleLogout}>
@@ -1835,14 +2066,14 @@ function App() {
               <div className="payment-summary-box">
                 <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>Mã đơn hàng:</div>
                 <strong style={{ fontVariantNumeric: 'tabular-nums' }}>#{activeOrder.orderCode}</strong>
-                
+
                 <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginTop: 'var(--space-sm)' }}>Gói nâng cấp:</div>
                 <strong>Gói {activeOrder.packageName} Enterprise SaaS</strong>
-                
+
                 <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginTop: 'var(--space-sm)' }}>Tổng số tiền:</div>
                 <span className="payment-amount">{activeOrder.amount.toLocaleString('vi-VN')}₫</span>
               </div>
-              
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xs)', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
                 <p>• Đây là giao dịch nâng cấp tài khoản Enterprise SaaS.</p>
                 <p>• Nhấn "Xác nhận Thanh toán" để gửi tín hiệu Webhook và nâng cấp tài khoản tức thì.</p>
@@ -1866,7 +2097,7 @@ function App() {
             </div>
             <div className="payment-dialog-body">
               <form onSubmit={handleUserFormSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-                
+
                 {userModalMode === 'create' && (
                   <>
                     <div className="form-group">
@@ -1962,9 +2193,9 @@ function App() {
               <button className="close-dialog" onClick={() => setShowCrudModal(false)}>×</button>
             </div>
             <div className="payment-dialog-body" style={{ overflowY: 'auto', maxHeight: 'calc(90vh - 120px)' }}>
-              
-              {/* Form to CREATE / UPDATE log item (Only editable for Admin role) */}
-              {user.role === 'ADMIN' ? (
+
+              {/* Form to CREATE / UPDATE log item (Editable for Admin and Manager roles) */}
+              {(user.role === 'ADMIN' || user.role === 'MANAGER') ? (
                 <form className="card" style={{ padding: 'var(--space-md)', background: 'rgba(255,255,255,0.01)', marginBottom: 'var(--space-md)' }} onSubmit={handleLogFormSubmit}>
                   <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: 'var(--space-md)', color: 'var(--color-accent)' }}>
                     {isEditingLog ? '📝 Chỉnh sửa bản ghi cũ' : '➕ Thêm log chấm công thủ công'}
@@ -1972,19 +2203,19 @@ function App() {
                   <div className="form-row" style={{ gap: 'var(--space-md)', marginBottom: 'var(--space-md)' }}>
                     <div className="form-group">
                       <label className="form-label">Chọn thời gian</label>
-                      <input 
-                        className="form-input" 
-                        type="datetime-local" 
-                        value={logForm.timestamp} 
+                      <input
+                        className="form-input"
+                        type="datetime-local"
+                        value={logForm.timestamp}
                         onChange={(e) => setLogForm(p => ({ ...p, timestamp: e.target.value }))}
-                        required 
+                        required
                       />
                     </div>
                     <div className="form-group">
                       <label className="form-label">Thao tác</label>
-                      <select 
-                        className="form-select" 
-                        value={logForm.action} 
+                      <select
+                        className="form-select"
+                        value={logForm.action}
                         onChange={(e) => setLogForm(p => ({ ...p, action: e.target.value }))}
                       >
                         <option value="CHECKIN">Check-in Vào Ca</option>
@@ -1994,12 +2225,12 @@ function App() {
                   </div>
                   <div className="form-group" style={{ marginBottom: 'var(--space-md)' }}>
                     <label className="form-label">Thiết bị / Nguồn xác thực</label>
-                    <input 
-                      className="form-input" 
-                      value={logForm.device} 
+                    <input
+                      className="form-input"
+                      value={logForm.device}
                       onChange={(e) => setLogForm(p => ({ ...p, device: e.target.value }))}
-                      placeholder="VD: Điều chỉnh thủ công bởi Admin"
-                      required 
+                      placeholder="VD: Điều chỉnh thủ công bởi Quản lý"
+                      required
                     />
                   </div>
                   <div style={{ display: 'flex', gap: 'var(--space-sm)', justifyContent: 'flex-end' }}>
@@ -2013,7 +2244,7 @@ function App() {
                 </form>
               ) : (
                 <div style={{ background: 'rgba(251,191,36,0.05)', border: '1px dashed rgba(251,191,36,0.3)', padding: 'var(--space-md)', borderRadius: 'var(--radius-md)', fontSize: '0.8rem', color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'var(--space-md)' }}>
-                  {Icons.lock} Chế độ Trưởng phòng (MANAGER): Bạn chỉ có quyền xem nhật ký, không thể thay đổi thông tin.
+                  {Icons.lock} Bạn chỉ có quyền xem nhật ký.
                 </div>
               )}
 
@@ -2021,7 +2252,7 @@ function App() {
               <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-sm)' }}>
                 Bản ghi chấm công gần đây ({crudUserLogs.length})
               </div>
-              
+
               {crudUserLogs.length > 0 ? (
                 <div style={{ overflowX: 'auto' }}>
                   <table className="data-table" style={{ fontSize: '0.8rem' }}>
@@ -2031,7 +2262,7 @@ function App() {
                         <th>Ngày</th>
                         <th>Giờ</th>
                         <th>Thiết bị</th>
-                        {user.role === 'ADMIN' && <th>Thao tác</th>}
+                        {(user.role === 'ADMIN' || user.role === 'MANAGER') && <th>Thao tác</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -2045,7 +2276,7 @@ function App() {
                           <td>{new Date(item.Timestamp).toLocaleDateString('vi-VN')}</td>
                           <td style={{ fontVariantNumeric: 'tabular-nums' }}>{new Date(item.Timestamp).toLocaleTimeString('vi-VN')}</td>
                           <td style={{ fontSize: '0.75rem', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.DeviceVerified}</td>
-                          {user.role === 'ADMIN' && (
+                          {(user.role === 'ADMIN' || user.role === 'MANAGER') && (
                             <td>
                               <div style={{ display: 'flex', gap: '4px' }}>
                                 <button className="btn btn-sm btn-ghost" style={{ padding: '2px 6px', fontSize: '0.7rem' }} onClick={() => startEditLog(item)}>Sửa</button>
